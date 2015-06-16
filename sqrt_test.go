@@ -70,7 +70,7 @@ func TestFloatSqrt64(t *testing.T) {
 }
 
 func TestFloatSqrt64Random(t *testing.T) {
-	for i := 0; i < 1e5; i++ {
+	for i := 0; i < 5e5; i++ {
 		r := rand.Float64() * 1e4
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floatutils.Sqrt(x).Float64()
@@ -81,7 +81,7 @@ func TestFloatSqrt64Random(t *testing.T) {
 	}
 }
 
-func TestSpecialValues(t *testing.T) {
+func TestSqrtSpecialValues(t *testing.T) {
 	for i, f := range []float64{
 		+0.0,
 		-0.0,
@@ -98,6 +98,8 @@ func TestSpecialValues(t *testing.T) {
 
 // ---------- Benchmarks ----------
 
+// result is global, every benchmark uses this
+// TODO: move somewhere else
 var result *big.Float
 
 func benchmarkSqrt(prec uint, b *testing.B) {

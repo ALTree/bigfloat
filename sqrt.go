@@ -12,12 +12,12 @@ func Sqrt(z *big.Float) *big.Float {
 		panic("square root of negative number")
 	}
 
-	// sqrt(±0) = ±0
+	// Sqrt(±0) = ±0
 	if z.Sign() == 0 {
 		return big.NewFloat(float64(z.Sign()))
 	}
 
-	// sqrt(+Inf) = +Inf
+	// Sqrt(+Inf) = +Inf
 	if z.IsInf() {
 		return big.NewFloat(math.Inf(+1))
 	}
