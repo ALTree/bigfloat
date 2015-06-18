@@ -37,12 +37,14 @@ func Sqrt(z *big.Float) *big.Float {
 	// initial estimate
 	x := new(big.Float).SetPrec(prec).SetMantExp(one, z.MantExp(nil)/2)
 
+	// TODO: no need to call setPrec
 	t := new(big.Float).SetPrec(prec)
 
 	// Newton:
 	//     x_{n+1} = 1/2 * ( x_n + (S / x_n) )
 
 	// we need at least log_2(prec) iterations
+	// TODO: test if new(big.Float).Mul(x, x).Cmp(z) != 0 is better
 	steps := math.Log2(float64(prec))
 
 	for i := 0; i < int(steps); i++ {
