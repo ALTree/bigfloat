@@ -45,5 +45,4 @@ func Pow(z *big.Float, n int) *big.Float {
 	}
 
 	return new(big.Float).SetPrec(z.Prec()).SetMantExp(x, exp)
-
 }

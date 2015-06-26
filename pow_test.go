@@ -78,7 +78,7 @@ func TestFloatPow64Random27(t *testing.T)  { testFloatPow64Random(27, t) }
 func TestFloatPow64Random63(t *testing.T)  { testFloatPow64Random(63, t) }
 func TestFloatPow64Random100(t *testing.T) { testFloatPow64Random(100, t) }
 
-func TestPowSpecialValues(t *testing.T) {
+func TestFloatPowSpecialValues(t *testing.T) {
 	for i, test := range []struct {
 		f float64
 		n int
@@ -105,11 +105,11 @@ func TestPowSpecialValues(t *testing.T) {
 
 // ---------- Benchmarks ----------
 
-func benchmarkPow(prec uint, n int, b *testing.B) {
+func benchmarkPow(prec uint, exp int, b *testing.B) {
 	x := new(big.Float).SetPrec(prec).SetFloat64(2.5)
 	var f *big.Float
 	for n := 0; n < b.N; n++ {
-		f = floatutils.Pow(x, n)
+		f = floatutils.Pow(x, exp)
 	}
 
 	result = f

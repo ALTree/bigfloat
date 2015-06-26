@@ -64,7 +64,6 @@ func TestFloatSqrt64(t *testing.T) {
 		want := math.Sqrt(float64(i))
 		if z != want || acc != big.Exact {
 			t.Errorf("sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
-
 		}
 	}
 }
@@ -81,7 +80,7 @@ func TestFloatSqrt64Random(t *testing.T) {
 	}
 }
 
-func TestSqrtSpecialValues(t *testing.T) {
+func TestFloatSqrtSpecialValues(t *testing.T) {
 	for i, f := range []float64{
 		+0.0,
 		-0.0,
@@ -102,8 +101,8 @@ func TestSqrtSpecialValues(t *testing.T) {
 // TODO: move somewhere else
 var result *big.Float
 
-func benchmarkSqrt(prec uint, b *testing.B) {
-	x := new(big.Float).SetPrec(prec).SetFloat64(2.0)
+func benchmarkSqrt(num float64, prec uint, b *testing.B) {
+	x := new(big.Float).SetPrec(prec).SetFloat64(num)
 	var f *big.Float
 	for n := 0; n < b.N; n++ {
 		f = floatutils.Sqrt(x)
@@ -112,8 +111,14 @@ func benchmarkSqrt(prec uint, b *testing.B) {
 	result = f
 }
 
-func BenchmarkSqrtPrec10(b *testing.B)     { benchmarkSqrt(1e1, b) }
-func BenchmarkSqrtPrec100(b *testing.B)    { benchmarkSqrt(1e2, b) }
-func BenchmarkSqrtPrec1000(b *testing.B)   { benchmarkSqrt(1e3, b) }
-func BenchmarkSqrtPrec10000(b *testing.B)  { benchmarkSqrt(1e4, b) }
-func BenchmarkSqrtPrec100000(b *testing.B) { benchmarkSqrt(1e5, b) }
+func BenchmarkSqrt2Prec10(b *testing.B)     { benchmarkSqrt(2, 1e1, b) }
+func BenchmarkSqrt2Prec100(b *testing.B)    { benchmarkSqrt(2, 1e2, b) }
+func BenchmarkSqrt2Prec1000(b *testing.B)   { benchmarkSqrt(2, 1e3, b) }
+func BenchmarkSqrt2Prec10000(b *testing.B)  { benchmarkSqrt(2, 1e4, b) }
+func BenchmarkSqrt2Prec100000(b *testing.B) { benchmarkSqrt(2, 1e5, b) }
+
+func BenchmarkSqrt1e5Prec10(b *testing.B)     { benchmarkSqrt(1e5, 1e1, b) }
+func BenchmarkSqrt1e5Prec100(b *testing.B)    { benchmarkSqrt(1e5, 1e2, b) }
+func BenchmarkSqrt1e5Prec1000(b *testing.B)   { benchmarkSqrt(1e5, 1e3, b) }
+func BenchmarkSqrt1e5Prec10000(b *testing.B)  { benchmarkSqrt(1e5, 1e4, b) }
+func BenchmarkSqrt1e5Prec100000(b *testing.B) { benchmarkSqrt(1e5, 1e5, b) }
