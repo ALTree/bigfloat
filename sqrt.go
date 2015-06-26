@@ -1,3 +1,5 @@
+// Package floatutils provides the implementation of a few additional operations for the
+// standard library big.Float type.
 package floatutils
 
 import (
@@ -5,6 +7,9 @@ import (
 	"math/big"
 )
 
+// Sqrt returns a big.Float representation of the square root of z. Precision is
+// the same as the one of the argument. The function panics if z is negative, returns ±0
+// when z = ±0, and +Inf when z = +Inf.
 func Sqrt(z *big.Float) *big.Float {
 
 	// panic on negative z < 0

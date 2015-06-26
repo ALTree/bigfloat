@@ -2,6 +2,8 @@ package floatutils
 
 import "math/big"
 
+// Pow returns a big.Float representation of z**n. Precision is the same as the one
+// of the first argument. The function panics when n is negative.
 func Pow(z *big.Float, n int) *big.Float {
 
 	if n < 0 {
