@@ -1,6 +1,8 @@
 package floatutils_test
 
 import (
+	"fmt"
+	"math"
 	"math/big"
 	"strconv"
 	"testing"
@@ -32,17 +34,34 @@ func TestPi(t *testing.T) {
 
 }
 
-// returns false if |a - b| > 2**(-lim)
-func compareFloats(a, b *big.Float, lim uint) bool {
+// returns true if |a - b| < 2**(-lim)
+func compareFloats(a, b *big.Float, lim uint, t *testing.T) bool {
+
 	limit := new(big.Float).SetPrec(lim)
-	limit.Parse("2e-"+strconv.Itoa(int(lim)), 10)
+
+	decimal_lim := int(float64(lim)*math.Log10(2)) - 1
+	limit.Parse("1e-"+strconv.Itoa(decimal_lim), 10)
 
 	sub := new(big.Float).SetPrec(lim)
 	sub.Sub(a, b)
 
+	fmt.Printf("limit = %.150f\n", limit)
+
+	// scale limit
+	limit.SetMantExp(limit, a.MantExp(nil))
+
+	fmt.Printf("limit = %.150f\n", limit)
+
 	if sub.Abs(sub).Cmp(limit) > 0 {
+		t.Errorf("limit = %.100f\n", limit)
+		t.Errorf("sub   = %.100f\n", sub)
 		return false
 	}
 
 	return true
 }
+
+// ---------- Benchmarks ----------
+
+// global benchmark dummy variable
+var result *big.Float

@@ -15,7 +15,7 @@ func TestSqrt(t *testing.T) {
 		prec uint
 		want string
 	}{
-		// 80 decimal digits are enough to give us 250 binary digits when parsed from the Parse function
+		// 80 decimal digits are enough to give us 250 binary digits when parsed by the Parse function
 		{"0.5", 250, "0.7071067811865475244008443621048490392848359376884740365883398689953662392310535"},
 		{"2.0", 250, "1.4142135623730950488016887242096980785696718753769480731766797379907324784621070"},
 		{"3.0", 250, "1.7320508075688772935274463415058723669428052538103806280558069794519330169088000"},
@@ -42,7 +42,7 @@ func TestSqrt(t *testing.T) {
 		}
 
 		// test returned value
-		if !compareFloats(want, z, test.prec) {
+		if !compareFloats(want, z, test.prec, t) {
 			t.Errorf("sqrt(%v): error is too big.\nwant = %.100e\ngot  = %.100e\n", x, z, want)
 		}
 	}
@@ -112,10 +112,6 @@ func TestSqrtSpecialValues(t *testing.T) {
 }
 
 // ---------- Benchmarks ----------
-
-// result is global, every benchmark uses this
-// TODO: move somewhere else
-var result *big.Float
 
 func benchmarkSqrt(num float64, prec uint, b *testing.B) {
 	x := new(big.Float).SetPrec(prec).SetFloat64(num)

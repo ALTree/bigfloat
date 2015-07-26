@@ -4,7 +4,6 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
-	"strconv"
 	"testing"
 
 	"github.com/ALTree/floatutils"
@@ -42,25 +41,15 @@ func TestFloatPow(t *testing.T) {
 			t.Errorf("pow(%v, %d): got %d prec, want %d prec", x, test.n, z.Prec(), test.prec)
 		}
 
-		// We don't require the value to be exact.
-		// Compute eps as (1e-X) * test.want, with
-		//     X = number of decimal digits equivalent to test.prec binary digits
-		// Then we compare the difference between result and wanted with eps
-		eps := new(big.Float).SetPrec(test.prec)
-		decimal_digits := int(float64(test.prec) / math.Log2(10))
-		eps.Parse("1e-"+strconv.Itoa(decimal_digits-1), 10)
-		eps.Mul(eps, want).Abs(eps) // Abs in case want < 0
-
-		diff := new(big.Float).SetPrec(test.prec)
-		diff.Sub(want, z).Abs(diff)
-
-		if diff.Cmp(eps) != -1 {
-			t.Errorf("pow(%v, %d):\ngot  %s\nwant %s", x, test.n, z.Text('e', int(eps.Prec())), want.Text('e', int(eps.Prec())))
+		// test returned value
+		if !compareFloats(want, z, test.prec, t) {
+			t.Errorf("pow(%e, %d): error is too big.\nwant = %.100e\ngot  = %.100e\n", x, test.n, z, want)
 		}
+
 	}
 }
 
-func testFloatPow64Random(n int, t *testing.T) {
+func testPow64(n int, t *testing.T) {
 	for i := 0; i < 2e5; i++ {
 		r := rand.Float64() * 1e5
 		x := big.NewFloat(r).SetPrec(53)
@@ -72,13 +61,13 @@ func testFloatPow64Random(n int, t *testing.T) {
 	}
 }
 
-func TestFloatPow64Random2(t *testing.T)   { testFloatPow64Random(2, t) }
-func TestFloatPow64Random16(t *testing.T)  { testFloatPow64Random(16, t) }
-func TestFloatPow64Random27(t *testing.T)  { testFloatPow64Random(27, t) }
-func TestFloatPow64Random63(t *testing.T)  { testFloatPow64Random(63, t) }
-func TestFloatPow64Random100(t *testing.T) { testFloatPow64Random(100, t) }
+func TestPow64Exp2(t *testing.T)   { testPow64(2, t) }
+func TestPow64Exp16(t *testing.T)  { testPow64(16, t) }
+func TestPow64Exp27(t *testing.T)  { testPow64(27, t) }
+func TestPow64Exp63(t *testing.T)  { testPow64(63, t) }
+func TestPow64Exp100(t *testing.T) { testPow64(100, t) }
 
-func TestFloatPowSpecialValues(t *testing.T) {
+func TestPowSpecialValues(t *testing.T) {
 	for i, test := range []struct {
 		f float64
 		n int
