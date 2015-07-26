@@ -39,7 +39,7 @@ func Sqrt(z *big.Float) *big.Float {
 	one := new(big.Float).SetPrec(prec).SetInt64(1)
 	half := new(big.Float).SetPrec(prec).SetFloat64(0.5)
 
-	// initial estimate
+	// Halve exponent for the initial estimate
 	x := new(big.Float).SetPrec(prec).SetMantExp(one, z.MantExp(nil)/2)
 
 	t := new(big.Float)
@@ -48,9 +48,9 @@ func Sqrt(z *big.Float) *big.Float {
 	//     x_{n+1} = 1/2 * ( x_n + (S / x_n) )
 
 	// we need at least log_2(prec) iterations
-	steps := math.Log2(float64(prec))
+	steps := int(math.Log2(float64(prec)))
 
-	for i := 0; i < int(steps); i++ {
+	for i := 0; i < steps; i++ {
 		t.Quo(z, x)    // t = S / x_n
 		t.Add(t, x)    // t = x_n + (S / x_n)
 		x.Mul(t, half) // x = t / 2

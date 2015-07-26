@@ -9,7 +9,7 @@ import (
 	"github.com/ALTree/floatutils"
 )
 
-func TestFloatSqrt(t *testing.T) {
+func TestSqrt(t *testing.T) {
 	for _, test := range []struct {
 		x    string
 		prec uint
@@ -36,41 +36,45 @@ func TestFloatSqrt(t *testing.T) {
 
 		z := floatutils.Sqrt(x)
 
+		// test if precision is correctly set
 		if z.Prec() != test.prec {
 			t.Errorf("sqrt(%v): got %d prec, want %d prec", x, z.Prec(), test.prec)
 		}
 
-		if want.Cmp(z) != 0 {
-			t.Errorf("sqrt(%v):\ngot  %s\nwant %s", x, z.Text('e', 78), want.Text('e', 78))
+		// test returned value
+		if !compareFloats(want, z, test.prec) {
+			t.Errorf("sqrt(%v): error is too big.\nwant = %.100e\ngot  = %.100e\n", x, z, want)
 		}
 	}
 }
 
-func TestFloatSqrt32(t *testing.T) {
-	for i := 2; i <= 1024; i++ {
-		x := big.NewFloat(float64(i)).SetPrec(24)
+func TestSqrt32Small(t *testing.T) {
+	for i := 0; i < 5e5; i++ {
+		r := rand.Float32() * 1e1
+		x := big.NewFloat(float64(r)).SetPrec(24)
 		z, acc := floatutils.Sqrt(x).Float32()
-		want := math.Sqrt(float64(i))
+		want := math.Sqrt(float64(r))
 		if z != float32(want) || acc != big.Exact {
-			t.Errorf("sqrt(%g):\ngot  %b (%s)\nwant %b (Exact)", x, z, acc, want)
-		}
-	}
-}
-
-func TestFloatSqrt64(t *testing.T) {
-	for i := 1; i <= 1024; i++ {
-		x := big.NewFloat(float64(i)).SetPrec(53)
-		z, acc := floatutils.Sqrt(x).Float64()
-		want := math.Sqrt(float64(i))
-		if z != want || acc != big.Exact {
 			t.Errorf("sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
 
-func TestFloatSqrt64Random(t *testing.T) {
+func TestSqrt32Big(t *testing.T) {
 	for i := 0; i < 5e5; i++ {
-		r := rand.Float64() * 1e4
+		r := rand.Float32()*1e6 + 1e3
+		x := big.NewFloat(float64(r)).SetPrec(24)
+		z, acc := floatutils.Sqrt(x).Float32()
+		want := math.Sqrt(float64(r))
+		if z != float32(want) || acc != big.Exact {
+			t.Errorf("sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+		}
+	}
+}
+
+func TestSqrt64Small(t *testing.T) {
+	for i := 0; i < 5e5; i++ {
+		r := rand.Float64() * 1e1
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floatutils.Sqrt(x).Float64()
 		want := math.Sqrt(r)
@@ -80,7 +84,19 @@ func TestFloatSqrt64Random(t *testing.T) {
 	}
 }
 
-func TestFloatSqrtSpecialValues(t *testing.T) {
+func TestSqrt64Big(t *testing.T) {
+	for i := 0; i < 5e5; i++ {
+		r := rand.Float64()*1e6 + 1e3
+		x := big.NewFloat(r).SetPrec(53)
+		z, acc := floatutils.Sqrt(x).Float64()
+		want := math.Sqrt(r)
+		if z != want || acc != big.Exact {
+			t.Errorf("sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+		}
+	}
+}
+
+func TestSqrtSpecialValues(t *testing.T) {
 	for i, f := range []float64{
 		+0.0,
 		-0.0,
@@ -116,9 +132,3 @@ func BenchmarkSqrt2Prec100(b *testing.B)    { benchmarkSqrt(2, 1e2, b) }
 func BenchmarkSqrt2Prec1000(b *testing.B)   { benchmarkSqrt(2, 1e3, b) }
 func BenchmarkSqrt2Prec10000(b *testing.B)  { benchmarkSqrt(2, 1e4, b) }
 func BenchmarkSqrt2Prec100000(b *testing.B) { benchmarkSqrt(2, 1e5, b) }
-
-func BenchmarkSqrt1e5Prec10(b *testing.B)     { benchmarkSqrt(1e5, 1e1, b) }
-func BenchmarkSqrt1e5Prec100(b *testing.B)    { benchmarkSqrt(1e5, 1e2, b) }
-func BenchmarkSqrt1e5Prec1000(b *testing.B)   { benchmarkSqrt(1e5, 1e3, b) }
-func BenchmarkSqrt1e5Prec10000(b *testing.B)  { benchmarkSqrt(1e5, 1e4, b) }
-func BenchmarkSqrt1e5Prec100000(b *testing.B) { benchmarkSqrt(1e5, 1e5, b) }
