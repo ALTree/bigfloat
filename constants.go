@@ -1,6 +1,9 @@
 package floatutils
 
-import "math"
+import (
+	"math"
+	"math/big"
+)
 
 // pi returns pi to prec bits of precision
 func pi(prec uint) *big.Float {

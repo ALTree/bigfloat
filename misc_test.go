@@ -1,4 +1,4 @@
-package floatutils
+package floatutils_test
 
 import (
 	"math"
