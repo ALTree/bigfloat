@@ -20,6 +20,7 @@ func TestLog(t *testing.T) {
 		{"0.25", 250, "-1.3862943611198906188344642429163531361510002687205105082413600189867872439393894"},
 		{"0.0125", 250, "-4.3820266346738816122696878190588939118276018917095387383953679294477534755864366"},
 
+		{"1", 250, "0.0000000000000000000000000000000000000000000000000000000000000000000000000000000"},
 		{"2", 250, "0.6931471805599453094172321214581765680755001343602552541206800094933936219696947"},
 		{"10", 250, "2.3025850929940456840179914546843642076011014886287729760333279009675726096773524"},
 		{"512", 250, "6.2383246250395077847550890931235891126795012092422972870861200854405425977272524"},
@@ -47,7 +48,7 @@ func TestLog(t *testing.T) {
 
 func TestLog32Small(t *testing.T) {
 	for i := 0; i < 5e3; i++ {
-		r := rand.Float32()*1e1 + 1
+		r := rand.Float32() * 1e1
 		x := big.NewFloat(float64(r)).SetPrec(24)
 		z, acc := floatutils.Log(x).Float32()
 		want := math.Log(float64(r))
@@ -69,13 +70,13 @@ func TestLog32Big(t *testing.T) {
 	}
 }
 
-// for the Log function we don't require complete compatibily
+// For the Log function we don't require complete compatibily
 // with native float64 arithmetic. Let's settle for an error
 // smaller than 1e-14
 
 func TestLog64Small(t *testing.T) {
 	for i := 0; i < 5e3; i++ {
-		r := rand.Float64()*1e1 + 1
+		r := rand.Float64() * 1e1
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floatutils.Log(x).Float64()
 		want := math.Log(r)
@@ -111,3 +112,21 @@ func TestLogSpecialValues(t *testing.T) {
 		}
 	}
 }
+
+// ---------- Benchmarks ----------
+
+func benchmarkLog(num float64, prec uint, b *testing.B) {
+	b.ReportAllocs()
+	x := new(big.Float).SetPrec(prec).SetFloat64(num)
+	var f *big.Float
+	for n := 0; n < b.N; n++ {
+		f = floatutils.Log(x)
+	}
+
+	result = f
+}
+
+func BenchmarkLog2Prec10(b *testing.B)    { benchmarkLog(2, 1e1, b) }
+func BenchmarkLog2Prec100(b *testing.B)   { benchmarkLog(2, 1e2, b) }
+func BenchmarkLog2Prec1000(b *testing.B)  { benchmarkLog(2, 1e3, b) }
+func BenchmarkLog2Prec10000(b *testing.B) { benchmarkLog(2, 1e4, b) }

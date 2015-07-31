@@ -38,12 +38,12 @@ func TestFloatPow(t *testing.T) {
 		z := floatutils.Pow(x, test.n)
 
 		if z.Prec() != test.prec {
-			t.Errorf("pow(%v, %d): got %d prec, want %d prec", x, test.n, z.Prec(), test.prec)
+			t.Errorf("Pow(%v, %d): got %d prec, want %d prec", x, test.n, z.Prec(), test.prec)
 		}
 
 		// test returned value
 		if !compareFloats(want, z, test.prec, t) {
-			t.Errorf("pow(%e, %d): error is too big.\nwant = %.100e\ngot  = %.100e\n", x, test.n, z, want)
+			t.Errorf("Pow(%e, %d): error is too big.\nwant = %.100e\ngot  = %.100e\n", x, test.n, z, want)
 		}
 
 	}
@@ -56,7 +56,7 @@ func testPow64(n int, t *testing.T) {
 		z, acc := floatutils.Pow(x, n).Float64()
 		want := math.Pow(r, float64(n))
 		if z != want {
-			t.Errorf("sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+			t.Errorf("Pow(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
@@ -87,7 +87,7 @@ func TestPowSpecialValues(t *testing.T) {
 		z, acc := floatutils.Pow(x, test.n).Float64()
 		want := math.Pow(test.f, float64(test.n))
 		if z != want {
-			t.Errorf("%d) sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", i, test.f, z, acc, want)
+			t.Errorf("%d) Pow(%g) =\n got %b (%s);\nwant %b (Exact)", i, test.f, z, acc, want)
 		}
 	}
 }
@@ -95,6 +95,7 @@ func TestPowSpecialValues(t *testing.T) {
 // ---------- Benchmarks ----------
 
 func benchmarkPow(prec uint, exp int, b *testing.B) {
+	b.ReportAllocs()
 	x := new(big.Float).SetPrec(prec).SetFloat64(2.5)
 	var f *big.Float
 	for n := 0; n < b.N; n++ {

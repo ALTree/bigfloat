@@ -5,6 +5,9 @@ import (
 	"math/big"
 )
 
+// Log returns a big.Float representation of the natural logarithm of z. Precision is
+// the same as the one of the argument. The function panics if z is negative, returns -Inf
+// when z = 0, and +Inf when z = +Inf
 func Log(z *big.Float) *big.Float {
 
 	// panic on negative z
@@ -17,29 +20,38 @@ func Log(z *big.Float) *big.Float {
 		return big.NewFloat(math.Inf(-1))
 	}
 
+	one := new(big.Float).SetInt64(1)
+
+	// Log(1) = 0
+	if z.Cmp(one) == 0 {
+		return new(big.Float).SetPrec(z.Prec()).SetInt64(0)
+	}
+
 	// Log(+Inf) = +Inf
 	if z.IsInf() {
 		return big.NewFloat(math.Inf(+1))
 	}
 
+	// 64 bits of guard digits like in sqrt.go
 	prec := z.Prec() + 64
-	var neg bool
-	if z.Cmp(new(big.Float).SetInt64(1)) < 0 {
-		neg = true
-	}
 
 	x := new(big.Float).SetPrec(prec)
 
-	if neg {
-		x.Quo(new(big.Float).SetInt64(1), z)
+	// if 0 < x < 1 we compute log(x) as -log(1/x)
+	var neg bool
+	if z.Cmp(one) < 0 {
+		x.Quo(one, z)
+		neg = true
 	} else {
 		x.Set(z)
 	}
 
-	// scale x until x >= 2**(prec/2)
+	// We scale up x until x >= 2**(prec/2), and then we'll be
+	// allowed to use the AGM formula for Log(x).
+	// Double x until the condition is met, and keep track of
+	// the number of doubling we did (needed to scale back later).
 	two := new(big.Float).SetPrec(prec).SetInt64(2)
-	lim := new(big.Float)
-	lim = Pow(two, int(prec/2))
+	lim := Pow(two, int(prec/2))
 
 	k := 0
 	for x.Cmp(lim) < 0 {
@@ -47,13 +59,17 @@ func Log(z *big.Float) *big.Float {
 		k++
 	}
 
-	// now we can use log_big
 	res := log_big(x)
+
+	// multiply by -1 if the initial argument was < 1
 	if neg {
 		res.Mul(res, new(big.Float).SetInt64(-1))
 	}
 
-	return res.Quo(res, Pow(two, k)).SetPrec(z.Prec()) // scale the result back
+	// scale the result back dividing by 2**k
+	res.Quo(res, Pow(two, k))
+
+	return res.SetPrec(z.Prec())
 }
 
 // log_big computes the natural log of z using the fact that

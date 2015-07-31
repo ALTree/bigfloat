@@ -38,12 +38,12 @@ func TestSqrt(t *testing.T) {
 
 		// test if precision is correctly set
 		if z.Prec() != test.prec {
-			t.Errorf("sqrt(%v): got %d prec, want %d prec", x, z.Prec(), test.prec)
+			t.Errorf("Sqrt(%v): got %d prec, want %d prec", x, z.Prec(), test.prec)
 		}
 
 		// test returned value
 		if !compareFloats(want, z, test.prec, t) {
-			t.Errorf("sqrt(%v): error is too big.\nwant = %.100e\ngot  = %.100e\n", x, z, want)
+			t.Errorf("Sqrt(%v): error is too big.\nwant = %.100e\ngot  = %.100e\n", x, z, want)
 		}
 	}
 }
@@ -55,7 +55,7 @@ func TestSqrt32Small(t *testing.T) {
 		z, acc := floatutils.Sqrt(x).Float32()
 		want := math.Sqrt(float64(r))
 		if z != float32(want) || acc != big.Exact {
-			t.Errorf("sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+			t.Errorf("Sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
@@ -67,7 +67,7 @@ func TestSqrt32Big(t *testing.T) {
 		z, acc := floatutils.Sqrt(x).Float32()
 		want := math.Sqrt(float64(r))
 		if z != float32(want) || acc != big.Exact {
-			t.Errorf("sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+			t.Errorf("Sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
@@ -79,7 +79,7 @@ func TestSqrt64Small(t *testing.T) {
 		z, acc := floatutils.Sqrt(x).Float64()
 		want := math.Sqrt(r)
 		if z != want || acc != big.Exact {
-			t.Errorf("sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+			t.Errorf("Sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
@@ -91,7 +91,7 @@ func TestSqrt64Big(t *testing.T) {
 		z, acc := floatutils.Sqrt(x).Float64()
 		want := math.Sqrt(r)
 		if z != want || acc != big.Exact {
-			t.Errorf("sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+			t.Errorf("Sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
@@ -106,7 +106,7 @@ func TestSqrtSpecialValues(t *testing.T) {
 		z, acc := floatutils.Sqrt(x).Float64()
 		want := math.Sqrt(f)
 		if z != want || acc != big.Exact {
-			t.Errorf("%d) sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", i, f, z, acc, want)
+			t.Errorf("%d) Sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", i, f, z, acc, want)
 		}
 	}
 }
@@ -114,6 +114,7 @@ func TestSqrtSpecialValues(t *testing.T) {
 // ---------- Benchmarks ----------
 
 func benchmarkSqrt(num float64, prec uint, b *testing.B) {
+	b.ReportAllocs()
 	x := new(big.Float).SetPrec(prec).SetFloat64(num)
 	var f *big.Float
 	for n := 0; n < b.N; n++ {
