@@ -12,7 +12,7 @@ import (
 // when z = ±0, and +Inf when z = +Inf.
 func Sqrt(z *big.Float) *big.Float {
 
-	// panic on negative z < 0
+	// panic on negative z
 	if z.Sign() == -1 {
 		panic("square root of negative number")
 	}

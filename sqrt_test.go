@@ -49,7 +49,7 @@ func TestSqrt(t *testing.T) {
 }
 
 func TestSqrt32Small(t *testing.T) {
-	for i := 0; i < 5e5; i++ {
+	for i := 0; i < 3e5; i++ {
 		r := rand.Float32() * 1e1
 		x := big.NewFloat(float64(r)).SetPrec(24)
 		z, acc := floatutils.Sqrt(x).Float32()
@@ -61,7 +61,7 @@ func TestSqrt32Small(t *testing.T) {
 }
 
 func TestSqrt32Big(t *testing.T) {
-	for i := 0; i < 5e5; i++ {
+	for i := 0; i < 3e5; i++ {
 		r := rand.Float32()*1e6 + 1e3
 		x := big.NewFloat(float64(r)).SetPrec(24)
 		z, acc := floatutils.Sqrt(x).Float32()
@@ -73,7 +73,7 @@ func TestSqrt32Big(t *testing.T) {
 }
 
 func TestSqrt64Small(t *testing.T) {
-	for i := 0; i < 5e5; i++ {
+	for i := 0; i < 3e5; i++ {
 		r := rand.Float64() * 1e1
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floatutils.Sqrt(x).Float64()
@@ -85,7 +85,7 @@ func TestSqrt64Small(t *testing.T) {
 }
 
 func TestSqrt64Big(t *testing.T) {
-	for i := 0; i < 5e5; i++ {
+	for i := 0; i < 3e5; i++ {
 		r := rand.Float64()*1e6 + 1e3
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floatutils.Sqrt(x).Float64()
