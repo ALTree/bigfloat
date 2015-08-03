@@ -88,7 +88,7 @@ func log_big(z *big.Float) *big.Float {
 	pi := pi(prec)
 
 	t := new(big.Float)
-	agm := Agm(one, t.Quo(four, z))
+	agm := agm(one, t.Quo(four, z))
 
 	return t.Quo(pi, t.Mul(two, agm))
 }
