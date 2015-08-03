@@ -12,7 +12,7 @@ func Log(z *big.Float) *big.Float {
 
 	// panic on negative z
 	if z.Sign() == -1 {
-		panic("Natural logarithm of negative number")
+		panic("Log: argument is negative")
 	}
 
 	// Log(0) = -Inf

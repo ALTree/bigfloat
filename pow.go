@@ -7,7 +7,7 @@ import "math/big"
 func Pow(z *big.Float, n int) *big.Float {
 
 	if n < 0 {
-		panic("negative powers are not supported")
+		panic("Pow: negative power")
 	}
 
 	// Pow(z, 0) = 1.0
@@ -24,7 +24,7 @@ func Pow(z *big.Float, n int) *big.Float {
 
 	// Pow(-Inf, n) gives error
 	if z.Signbit() && z.IsInf() {
-		panic("-Inf base")
+		panic("Pow: -Inf base")
 	}
 
 	// get mantissa and exponent of z
