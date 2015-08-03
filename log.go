@@ -61,9 +61,9 @@ func Log(z *big.Float) *big.Float {
 
 	res := log_big(x)
 
-	// multiply by -1 if the initial argument was < 1
+	// change sign if the z was < 1
 	if neg {
-		res.Mul(res, new(big.Float).SetInt64(-1))
+		res.Neg(res)
 	}
 
 	// scale the result back dividing by 2**k
