@@ -9,7 +9,7 @@ import (
 	"github.com/ALTree/floatutils"
 )
 
-func TestFloatPow(t *testing.T) {
+func TestPow(t *testing.T) {
 	for _, test := range []struct {
 		x    string
 		n    int
