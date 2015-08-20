@@ -1,6 +1,8 @@
-### Floatutils [![GoDoc](https://godoc.org/github.com/ALTree/floatutils?status.png)](https://godoc.org/github.com/ALTree/floatutils)
+### Floatutils 
 
 Package floatutils provides the implementation of a few additional operations (square root, exponentiation, natural logarithm) for the standard library `big.Float` type.
+
+[![GoDoc](https://godoc.org/github.com/ALTree/floatutils?status.png)](https://godoc.org/github.com/ALTree/floatutils)
 
 #### Install
 
