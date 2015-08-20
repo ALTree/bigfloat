@@ -59,7 +59,7 @@ func Log(z *big.Float) *big.Float {
 		k++
 	}
 
-	res := log_big(x)
+	res := logBig(x)
 
 	// change sign if the z was < 1
 	if neg {
@@ -77,7 +77,7 @@ func Log(z *big.Float) *big.Float {
 // if
 //     z >= 2**(prec/2),
 // where prec is the desired precision (in bits)
-func log_big(z *big.Float) *big.Float {
+func logBig(z *big.Float) *big.Float {
 
 	prec := z.Prec()
 

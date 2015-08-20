@@ -41,9 +41,9 @@ func TestAgm(t *testing.T) {
 }
 
 func TestPi(t *testing.T) {
-	pi_str := "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899"
+	piStr := "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899"
 	want := new(big.Float).SetPrec(250)
-	want.Parse(pi_str, 10)
+	want.Parse(piStr, 10)
 
 	z := pi(250)
 
@@ -63,8 +63,8 @@ func compareFloats(a, b *big.Float, lim uint, t *testing.T) bool {
 
 	limit := new(big.Float).SetPrec(lim)
 
-	decimal_lim := int(float64(lim)*math.Log10(2)) - 1
-	limit.Parse("1e-"+strconv.Itoa(decimal_lim), 10)
+	dl := int(float64(lim)*math.Log10(2)) - 1 // lim in decimal
+	limit.Parse("1e-"+strconv.Itoa(dl), 10)
 
 	sub := new(big.Float).SetPrec(lim)
 	sub.Sub(a, b)
