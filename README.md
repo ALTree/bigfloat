@@ -29,8 +29,11 @@ func main() {
 	z := fu.Sqrt(two) // z.Prec is automatically set to 200
 
 	fmt.Printf("sqrt(2) = %.50f...\n", z) // print the first 50 decimal digits
-	// sqrt(2) = 1.41421356237309504880168872420969807856967187537694...
 }
+```
+outputs
+```
+sqrt(2) = 1.41421356237309504880168872420969807856967187537694...
 ```
 
 #### Documentation
