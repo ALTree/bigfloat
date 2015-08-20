@@ -1,7 +1,9 @@
 package floatutils
 
 import (
+	"math"
 	"math/big"
+	"strconv"
 	"testing"
 )
 
@@ -54,4 +56,27 @@ func TestPi(t *testing.T) {
 		t.Errorf("pi(250): error is too big.\nwant = %.100e\ngot  = %.100e\n", z, want)
 	}
 
+}
+
+// see sqrt_test.go
+func compareFloats(a, b *big.Float, lim uint, t *testing.T) bool {
+
+	limit := new(big.Float).SetPrec(lim)
+
+	decimal_lim := int(float64(lim)*math.Log10(2)) - 1
+	limit.Parse("1e-"+strconv.Itoa(decimal_lim), 10)
+
+	sub := new(big.Float).SetPrec(lim)
+	sub.Sub(a, b)
+
+	// scale limit
+	limit.SetMantExp(limit, a.MantExp(nil))
+
+	if sub.Abs(sub).Cmp(limit) > 0 {
+		t.Errorf("limit = %.100f\n", limit)
+		t.Errorf("sub   = %.100f\n", sub)
+		return false
+	}
+
+	return true
 }

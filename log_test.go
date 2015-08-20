@@ -53,7 +53,7 @@ func TestLog32Small(t *testing.T) {
 		z, acc := floatutils.Log(x).Float32()
 		want := math.Log(float64(r))
 		if z != float32(want) || acc != big.Exact {
-			t.Errorf("Log(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
@@ -65,7 +65,7 @@ func TestLog32Big(t *testing.T) {
 		z, acc := floatutils.Log(x).Float32()
 		want := math.Log(float64(r))
 		if z != float32(want) || acc != big.Exact {
-			t.Errorf("Log(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
@@ -73,7 +73,9 @@ func TestLog32Big(t *testing.T) {
 // For the Log function we don't require complete compatibily
 // with native float64 arithmetic. Let's settle for an error
 // smaller than 1e-14
-
+// Log actually computes the correct value (using prec plus 64
+// guard digits), but the final SetPrec(53) causes an error in
+// the last decimal digit.
 func TestLog64Small(t *testing.T) {
 	for i := 0; i < 5e3; i++ {
 		r := rand.Float64() * 1e1
@@ -81,7 +83,7 @@ func TestLog64Small(t *testing.T) {
 		z, acc := floatutils.Log(x).Float64()
 		want := math.Log(r)
 		if math.Abs(z-want) > 1e-14 || acc != big.Exact {
-			t.Errorf("Log(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
@@ -93,7 +95,7 @@ func TestLog64Big(t *testing.T) {
 		z, acc := floatutils.Log(x).Float64()
 		want := math.Log(r)
 		if math.Abs(z-want) > 1e-14 || acc != big.Exact {
-			t.Errorf("Log(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
 		}
 	}
 }
@@ -108,7 +110,7 @@ func TestLogSpecialValues(t *testing.T) {
 		z, acc := floatutils.Log(x).Float64()
 		want := math.Log(f)
 		if z != want || acc != big.Exact {
-			t.Errorf("%d) Log(%g) =\n got %b (%s);\nwant %b (Exact)", i, f, z, acc, want)
+			t.Errorf("%d) Log(%f) =\n got %b (%s);\nwant %b (Exact)", i, f, z, acc, want)
 		}
 	}
 }
