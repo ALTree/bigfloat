@@ -16,21 +16,24 @@ func agm(a, b *big.Float) *big.Float {
 		prec = b.Prec()
 	}
 
+	prec = prec + 64
+
 	half := new(big.Float).SetPrec(prec).SetFloat64(0.5)
 
 	a2 := new(big.Float)
 	b2 := new(big.Float)
-	a2.Copy(a)
-	b2.Copy(b)
+	a2.Copy(a).SetPrec(prec)
+	b2.Copy(b).SetPrec(prec)
 
-	// we need at least 2 * Log_2(prec) steps
-	steps := int(math.Log2(float64(prec)))*2 + 1
+	// we need at least 4 * Log_2(prec) steps
+	// TODO: what? why? Investigate literature.
+	steps := int(math.Log2(float64(prec)))*4 + 1
 	for i := 0; i < steps; i++ {
 		t, t2 := new(big.Float), new(big.Float)
 		a2, b2 = t.Add(a2, b2).Mul(t, half), Sqrt(t2.Mul(a2, b2))
 	}
 
-	return a2
+	return a2.SetPrec(prec - 64)
 }
 
 // pi returns pi to prec bits of precision
