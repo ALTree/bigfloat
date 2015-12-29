@@ -16,6 +16,8 @@ func agm(a, b *big.Float) *big.Float {
 		prec = b.Prec()
 	}
 
+	prec += 64
+
 	half := new(big.Float).SetPrec(prec).SetFloat64(0.5)
 
 	a2 := new(big.Float)
@@ -23,16 +25,22 @@ func agm(a, b *big.Float) *big.Float {
 	a2.Copy(a).SetPrec(prec)
 	b2.Copy(b).SetPrec(prec)
 
-	t, t2 := new(big.Float), new(big.Float)
-	ttest := new(big.Float)
-	for ttest.Cmp(a2) != 0 { // iterate until a2 reach a fixed value
-		ttest.Copy(a2)
-		t.Add(a2, b2).Mul(t, half)
-		b2 = Sqrt(t2.Mul(a2, b2))
-		a2.Copy(t)
+	checkA := new(big.Float).Copy(a2).SetPrec(prec - 64)
+	checkB := new(big.Float).Copy(b2).SetPrec(prec - 64)
+	t1 := new(big.Float)
+
+	// iterate until a2 == b2 (with a2 and b2 reduced to the
+	// desired precision, i.e. ignoring the guard digits)
+	for checkA.Cmp(checkB) != 0 {
+		t1.Copy(a2)
+		a2.Add(a2, b2).Mul(a2, half)
+		b2 = Sqrt(b2.Mul(t1, b2))
+
+		checkA.Copy(a2).SetPrec(prec - 64)
+		checkB.Copy(b2).SetPrec(prec - 64)
 	}
 
-	return a2
+	return checkA
 }
 
 // pi returns pi to prec bits of precision

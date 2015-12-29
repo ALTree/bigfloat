@@ -45,7 +45,7 @@ func TestLog(t *testing.T) {
 
 			// test returned value
 			if z.Cmp(want) != 0 {
-				t.Errorf("Log(%v): error is too big.\nwant = %.100e\ngot  = %.100e\n", x, z, want)
+				t.Errorf("Log(%v) with prec %d failed\nwant = %g\ngot  = %g\n", x, prec, want, z)
 			}
 		}
 	}
