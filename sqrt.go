@@ -27,14 +27,7 @@ func Sqrt(z *big.Float) *big.Float {
 		return big.NewFloat(math.Inf(+1))
 	}
 
-	// We need extra-precision to make Sqrt results 100%
-	// compatible with what math.Sqrt returns on regular float64s.
-	// Not sure how much extra bits we really need, but
-	// forcing a whole new Word in the nat representation seems reasonable.
-	// 32 seems to work too, but leave 64 for now.
-	// Performance is about 40% worse when prec ~ 10,
-	// otherwise there's no difference.
-	prec := z.Prec() + 64 // TODO: find a better value
+	prec := z.Prec() + 64
 
 	one := new(big.Float).SetPrec(prec).SetInt64(1)
 	half := new(big.Float).SetPrec(prec).SetFloat64(0.5)
