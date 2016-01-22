@@ -33,19 +33,21 @@ func TestLog(t *testing.T) {
 			want := new(big.Float).SetPrec(prec)
 			want.Parse(test.want, 10)
 
-			x := new(big.Float).SetPrec(prec)
+			x := new(big.Float).SetPrec(prec + 16) // see sqrt_test.go
 			x.Parse(test.x, 10)
 
 			z := floatutils.Log(x)
 
-			// test if the precision is correctly set
-			if z.Prec() != prec {
-				t.Errorf("Log(%v): got %d prec, want %d prec", x, z.Prec(), prec)
+			wantMaxPrec, _, err := big.ParseFloat(test.want, 0, maxPrec, big.ToNearestEven)
+			if err != nil {
+				t.Errorf("prec = %d, parse(%s): %v", maxPrec, test.want, err)
 			}
+			acc := big.Accuracy(want.Cmp(wantMaxPrec))
 
-			// test returned value
-			if z.Cmp(want) != 0 {
-				t.Errorf("Log(%v) with prec %d failed\nwant = %g\ngot  = %g\n", x, prec, want, z)
+			z.SetPrec(prec)
+
+			if z.Cmp(want) != 0 || z.Acc() != acc {
+				t.Errorf("prec = %d, Log(%v) = %g (%v); want %g (%v)", prec, test.x, z, z.Acc(), want, acc)
 			}
 		}
 	}
