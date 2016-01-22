@@ -1,9 +1,7 @@
 package floatutils
 
 import (
-	"math"
 	"math/big"
-	"strconv"
 	"testing"
 )
 
@@ -53,42 +51,27 @@ func TestAgm(t *testing.T) {
 }
 
 func TestPi(t *testing.T) {
-	piStr := "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899"
-	want := new(big.Float).SetPrec(250)
-	want.Parse(piStr, 10)
+	piStr := "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153644"
 
-	z := pi(250)
+	for _, prec := range []uint{24, 53, 64, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000} {
 
-	if z.Prec() != 250 {
-		t.Errorf("pi(250): got %d prec, want %d prec", z.Prec(), 250)
+		want := new(big.Float).SetPrec(prec)
+		want.Parse(piStr, 10)
+
+		z := pi(prec)
+
+		wantMaxPrec, _, err := big.ParseFloat(piStr, 0, maxPrec, big.ToNearestEven)
+		if err != nil {
+			t.Errorf("prec = %d, parse(%s): %v", maxPrec, want, err)
+		}
+		acc := big.Accuracy(want.Cmp(wantMaxPrec))
+
+		z.SetPrec(prec)
+
+		if z.Cmp(want) != 0 /*|| z.Acc() != acc */ { // not for now
+			t.Errorf("pi(%d) = %g (%v); want %g (%v)", prec, z, z.Acc(), want, acc)
+		}
+
 	}
 
-	// test returned value
-	if !compareFloats(want, z, 250, t) {
-		t.Errorf("pi(250): error is too big.\nwant = %.100e\ngot  = %.100e\n", z, want)
-	}
-
-}
-
-// see sqrt_test.go
-func compareFloats(a, b *big.Float, lim uint, t *testing.T) bool {
-
-	limit := new(big.Float).SetPrec(lim)
-
-	dl := int(float64(lim)*math.Log10(2)) - 1 // lim in decimal
-	limit.Parse("1e-"+strconv.Itoa(dl), 10)
-
-	sub := new(big.Float).SetPrec(lim)
-	sub.Sub(a, b)
-
-	// scale limit
-	limit.SetMantExp(limit, a.MantExp(nil))
-
-	if sub.Abs(sub).Cmp(limit) > 0 {
-		t.Errorf("limit = %.100f\n", limit)
-		t.Errorf("sub   = %.100f\n", sub)
-		return false
-	}
-
-	return true
 }
