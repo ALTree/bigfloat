@@ -9,6 +9,7 @@ import (
 	"github.com/ALTree/floatutils"
 )
 
+/*
 func TestPow(t *testing.T) {
 	for _, test := range []struct {
 		x    string
@@ -46,6 +47,47 @@ func TestPow(t *testing.T) {
 			t.Errorf("Pow(%e, %d): error is too big.\nwant = %.100e\ngot  = %.100e\n", x, test.n, z, want)
 		}
 
+	}
+}
+*/
+
+func TestPow(t *testing.T) {
+	for _, test := range []struct {
+		x    string
+		n    int
+		want string
+	}{
+		// 350 decimal digits are enough to give us up to 1000 binary digits
+		{"1.0", 4, "1.0"},
+		{"2.0", 8, "256.0"},
+		{"2.5", 8, "1525.87890625"},
+		{"3.0", 8, "6561.0"},
+		{"3.4", 16, "3.189059870763703892770816e8"},
+		{"4.6", 32, "1.61529040680870074100680119806799048214504294859145216e21"},
+		{"5.7", 64, "2.3767897344134118845792411633735801064687423783821619363360084403117800446467034136609454101929141476456488896001e48"},
+	} {
+		for _, prec := range []uint{24, 53, 64, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000} {
+			want := new(big.Float).SetPrec(prec)
+			want.Parse(test.want, 10)
+
+			x := new(big.Float).SetPrec(prec + 16) // see sqrt_test.go
+			x.Parse(test.x, 10)
+
+			z := floatutils.Pow(x, test.n)
+			want.SetPrec(prec)
+
+			wantMaxPrec, _, err := big.ParseFloat(test.want, 0, maxPrec, big.ToNearestEven)
+			if err != nil {
+				t.Errorf("prec = %d, parse(%s): %v", maxPrec, test.want, err)
+			}
+			acc := big.Accuracy(want.Cmp(wantMaxPrec))
+
+			z.SetPrec(prec)
+
+			if z.Cmp(want) != 0 || z.Acc() != acc {
+				t.Errorf("prec = %d, Pow(%v, %d) = %g (%v); want %g (%v)", prec, test.x, test.n, z, z.Acc(), want, acc)
+			}
+		}
 	}
 }
 
