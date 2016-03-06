@@ -153,12 +153,9 @@ func TestLogSpecialValues(t *testing.T) {
 func benchmarkLog(num float64, prec uint, b *testing.B) {
 	b.ReportAllocs()
 	x := new(big.Float).SetPrec(prec).SetFloat64(num)
-	var f *big.Float
 	for n := 0; n < b.N; n++ {
-		f = floatutils.Log(x)
+		floatutils.Log(x)
 	}
-
-	result = f
 }
 
 func BenchmarkLog2Prec53(b *testing.B)    { benchmarkLog(2, 53, b) }

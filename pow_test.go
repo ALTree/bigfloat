@@ -97,12 +97,9 @@ func TestPowSpecialValues(t *testing.T) {
 func benchmarkPow(prec uint, exp int, b *testing.B) {
 	b.ReportAllocs()
 	x := new(big.Float).SetPrec(prec).SetFloat64(2.5)
-	var f *big.Float
 	for n := 0; n < b.N; n++ {
-		f = floatutils.Pow(x, exp)
+		floatutils.Pow(x, exp)
 	}
-
-	result = f
 }
 
 func BenchmarkPow2Prec10(b *testing.B)     { benchmarkPow(1e1, 2, b) }
