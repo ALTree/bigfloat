@@ -1,6 +1,6 @@
-// Package floatutils provides the implementation of a few additional operations for the
+// Package floats provides the implementation of a few additional operations for the
 // standard library big.Float type.
-package floatutils
+package floats
 
 import (
 	"math"

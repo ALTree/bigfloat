@@ -1,4 +1,4 @@
-package floatutils
+package floats
 
 import (
 	"math/big"

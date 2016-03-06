@@ -1,4 +1,4 @@
-package floatutils_test
+package floats_test
 
 import (
 	"math"
@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ALTree/floatutils"
+	"github.com/ALTree/floats"
 )
 
 // See note in sqrt_test.go about which numbers
@@ -33,7 +33,7 @@ func TestPow(t *testing.T) {
 			x := new(big.Float).SetPrec(prec)
 			x.Parse(test.x, 10)
 
-			z := floatutils.Pow(x, test.n)
+			z := floats.Pow(x, test.n)
 
 			if z.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Pow(%v, %d) =\ngot  %g;\nwant %g", prec, test.x, test.n, z, want)
@@ -46,7 +46,7 @@ func testPow64(n int, t *testing.T) {
 	for i := 0; i < 2e5; i++ {
 		r := rand.Float64() * 1e5
 		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floatutils.Pow(x, n).Float64()
+		z, acc := floats.Pow(x, n).Float64()
 		want := math.Pow(r, float64(n))
 		if z != want {
 			t.Errorf("Pow(%g, %d) =\n got %b (%s);\nwant %b (Exact)", x, n, z, acc, want)
@@ -77,7 +77,7 @@ func TestPowSpecialValues(t *testing.T) {
 		{-1.0, 3},
 	} {
 		x := big.NewFloat(test.f).SetPrec(53)
-		z, acc := floatutils.Pow(x, test.n).Float64()
+		z, acc := floats.Pow(x, test.n).Float64()
 		want := math.Pow(test.f, float64(test.n))
 		if z != want {
 			t.Errorf("%d) Pow(%g) =\n got %b (%s);\nwant %b (Exact)", i, test.f, z, acc, want)
@@ -91,7 +91,7 @@ func benchmarkPow(prec uint, exp int, b *testing.B) {
 	b.ReportAllocs()
 	x := new(big.Float).SetPrec(prec).SetFloat64(2.5)
 	for n := 0; n < b.N; n++ {
-		floatutils.Pow(x, exp)
+		floats.Pow(x, exp)
 	}
 }
 

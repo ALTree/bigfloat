@@ -1,4 +1,4 @@
-package floatutils_test
+package floats_test
 
 import (
 	"math"
@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ALTree/floatutils"
+	"github.com/ALTree/floats"
 )
 
 // See note in sqrt_test.go about which numbers
@@ -35,7 +35,7 @@ func TestLog(t *testing.T) {
 			x := new(big.Float).SetPrec(prec)
 			x.Parse(test.x, 10)
 
-			z := floatutils.Log(x)
+			z := floats.Log(x)
 
 			if z.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Log(%v) =\ngot %g;\n want %g", prec, test.x, z, want)
@@ -48,7 +48,7 @@ func TestLog32(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
 		r := rand.Float32() * 1e3
 		x := big.NewFloat(float64(r)).SetPrec(24)
-		z, acc := floatutils.Log(x).Float32()
+		z, acc := floats.Log(x).Float32()
 		want := math.Log(float64(r))
 		if z != float32(want) || acc != big.Exact {
 			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
@@ -60,7 +60,7 @@ func TestLog32Small(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
 		r := rand.Float32() * 1e-30
 		x := big.NewFloat(float64(r)).SetPrec(24)
-		z, acc := floatutils.Log(x).Float32()
+		z, acc := floats.Log(x).Float32()
 		want := math.Log(float64(r))
 		if z != float32(want) || acc != big.Exact {
 			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
@@ -72,7 +72,7 @@ func TestLog32Big(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
 		r := rand.Float32() * 1e30
 		x := big.NewFloat(float64(r)).SetPrec(24)
-		z, acc := floatutils.Log(x).Float32()
+		z, acc := floats.Log(x).Float32()
 		want := math.Log(float64(r))
 		if z != float32(want) || acc != big.Exact {
 			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
@@ -93,7 +93,7 @@ func TestLog64(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
 		r := rand.Float64() * 1e3
 		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floatutils.Log(x).Float64()
+		z, acc := floats.Log(x).Float64()
 		want := math.Log(r)
 		if math.Abs(z-want) > 1e-14 || acc != big.Exact {
 			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z, acc, want)
@@ -105,7 +105,7 @@ func TestLog64Small(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
 		r := rand.Float64() * 1e-300
 		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floatutils.Log(x).Float64()
+		z, acc := floats.Log(x).Float64()
 		want := math.Log(r)
 		if math.Abs(z-want) > 1e-12 || acc != big.Exact { // 1e-12 for very small values
 			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z, acc, want)
@@ -117,7 +117,7 @@ func TestLog64Big(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
 		r := rand.Float64() * 1e300
 		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floatutils.Log(x).Float64()
+		z, acc := floats.Log(x).Float64()
 		want := math.Log(r)
 		if math.Abs(z-want) > 1e-14 || acc != big.Exact {
 			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z, acc, want)
@@ -132,7 +132,7 @@ func TestLogSpecialValues(t *testing.T) {
 		math.Inf(+1),
 	} {
 		x := big.NewFloat(f).SetPrec(53)
-		z, acc := floatutils.Log(x).Float64()
+		z, acc := floats.Log(x).Float64()
 		want := math.Log(f)
 		if z != want || acc != big.Exact {
 			t.Errorf("%d) Log(%f) =\n got %b (%s);\nwant %b (Exact)", i, f, z, acc, want)
@@ -146,7 +146,7 @@ func benchmarkLog(num float64, prec uint, b *testing.B) {
 	b.ReportAllocs()
 	x := new(big.Float).SetPrec(prec).SetFloat64(num)
 	for n := 0; n < b.N; n++ {
-		floatutils.Log(x)
+		floats.Log(x)
 	}
 }
 
