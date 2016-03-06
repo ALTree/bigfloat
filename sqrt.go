@@ -41,7 +41,7 @@ func Sqrt(z *big.Float) *big.Float {
 	//     x_{n+1} = 1/2 * ( x_n + (S / x_n) )
 
 	// we need at least log_2(prec) iterations
-	steps := int(math.Log2(float64(prec))) + 1
+	steps := int(math.Log2(float64(prec)))
 
 	for i := 0; i < steps; i++ {
 		t.Quo(z, x)    // t = S / x_n
