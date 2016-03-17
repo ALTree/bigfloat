@@ -20,7 +20,11 @@ func Log(z *big.Float) *big.Float {
 		return big.NewFloat(math.Inf(-1))
 	}
 
-	one := new(big.Float).SetInt64(1)
+	prec := z.Prec() + 64 // guard digits
+
+	one := new(big.Float).SetPrec(prec).SetInt64(1)
+	two := new(big.Float).SetPrec(prec).SetInt64(2)
+	four := new(big.Float).SetPrec(prec).SetInt64(4)
 
 	// Log(1) = 0
 	if z.Cmp(one) == 0 {
@@ -29,11 +33,8 @@ func Log(z *big.Float) *big.Float {
 
 	// Log(+Inf) = +Inf
 	if z.IsInf() {
-		return big.NewFloat(math.Inf(+1))
+		return big.NewFloat(math.Inf(+1)).SetPrec(z.Prec())
 	}
-
-	// 64 bits of guard digits like in sqrt.go
-	prec := z.Prec() + 64
 
 	x := new(big.Float).SetPrec(prec)
 
@@ -50,7 +51,7 @@ func Log(z *big.Float) *big.Float {
 	// allowed to use the AGM formula for Log(x).
 	// Double x until the condition is met, and keep track of
 	// the number of doubling we did (needed to scale back later).
-	two := new(big.Float).SetPrec(prec).SetInt64(2)
+
 	lim := Pow(two, int(prec/2))
 
 	k := 0
@@ -59,36 +60,24 @@ func Log(z *big.Float) *big.Float {
 		k++
 	}
 
-	res := logBig(x)
+	// Compute the natural log of x using the fact that
+	//     log(x) = π / (2 * AGM(1, 4/x))
+	// if
+	//     x >= 2**(prec/2),
+	// where prec is the desired precision (in bits)
+
+	pi := pi(prec)
+	agm := agm(one, x.Quo(four, x)) // agm = AGM(1, 4/x)
+
+	x.Quo(pi, x.Mul(two, agm)) // reuse x, we don't need it
 
 	// change sign if the z was < 1
 	if neg {
-		res.Neg(res)
+		x.Neg(x)
 	}
 
 	// scale the result back dividing by 2**k
-	res.Quo(res, Pow(two, k))
+	x.Quo(x, Pow(two, k))
 
-	return res.SetPrec(z.Prec())
-}
-
-// log_big computes the natural log of z using the fact that
-//     log(z) = π / (2 * AGM(1, 4/z))
-// if
-//     z >= 2**(prec/2),
-// where prec is the desired precision (in bits)
-func logBig(z *big.Float) *big.Float {
-
-	prec := z.Prec()
-
-	one := new(big.Float).SetPrec(prec).SetInt64(1)
-	two := new(big.Float).SetPrec(prec).SetInt64(2)
-	four := new(big.Float).SetPrec(prec).SetInt64(4)
-
-	pi := pi(prec)
-
-	t := new(big.Float)
-	agm := agm(one, t.Quo(four, z))
-
-	return t.Quo(pi, t.Mul(two, agm))
+	return x.SetPrec(z.Prec())
 }
