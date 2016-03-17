@@ -27,28 +27,45 @@ func Sqrt(z *big.Float) *big.Float {
 		return big.NewFloat(math.Inf(+1))
 	}
 
-	prec := z.Prec() + 64
+	prec := z.Prec() + 64 // guard digits
 
-	one := new(big.Float).SetPrec(prec).SetInt64(1)
 	half := new(big.Float).SetPrec(prec).SetFloat64(0.5)
+	one := new(big.Float).SetPrec(prec).SetInt64(1)
+	three := new(big.Float).SetPrec(prec).SetInt64(3)
 
-	// Halve exponent for the initial estimate
-	x := new(big.Float).SetPrec(prec).SetMantExp(one, z.MantExp(nil)/2)
+	// Compute sqrt(z) via 1/sqrt(z) to avoid divisions.
+	// Applying Newton to (1/x²) - z = 0 gives
+	//     x_{n+1} = 0.5x_{n}(3 - zx²)
+	// which uses only 3 multiplications, and converge
+	// quadratically.
 
-	t := new(big.Float)
+	// x will hold the value of 1/sqrt(z)
+	x := new(big.Float).SetPrec(prec)
 
-	// Newton:
-	//     x_{n+1} = 1/2 * ( x_n + (S / x_n) )
+	// get initial estimate using IEEE-754 math
+	zf, _ := z.Float64()
+	if zfs := math.Sqrt(zf); zfs != 0 {
+		x.SetFloat64(1 / zfs)
+	} else {
+		x.SetMantExp(one, z.MantExp(nil)/2)
+		x.Quo(one, x)
+	}
 
 	// we need at least log_2(prec) iterations
 	steps := int(math.Log2(float64(prec)))
 
+	t := new(big.Float)
+
 	for i := 0; i < steps; i++ {
-		t.Quo(z, x)    // t = S / x_n
-		t.Add(t, x)    // t = x_n + (S / x_n)
-		x.Mul(t, half) // x = t / 2
+		t.Mul(x, x)     // t = x²
+		t.Mul(t, z)     // t = zx²
+		t.Sub(three, t) // t = 3 - zx²
+		t.Mul(t, half)
+		x.Mul(x, t)
 	}
 
-	return x.SetPrec(z.Prec())
+	// sqrt(z) = z * (1/sqrt(z))
+	x.Mul(x, z)
 
+	return x.SetPrec(z.Prec())
 }

@@ -149,7 +149,7 @@ func benchmarkSqrt(num float64, prec uint, b *testing.B) {
 	}
 }
 
-func BenchmarkSqrt2Prec10(b *testing.B)     { benchmarkSqrt(2, 1e1, b) }
+func BenchmarkSqrt2Prec53(b *testing.B)     { benchmarkSqrt(2, 53, b) }
 func BenchmarkSqrt2Prec100(b *testing.B)    { benchmarkSqrt(2, 1e2, b) }
 func BenchmarkSqrt2Prec1000(b *testing.B)   { benchmarkSqrt(2, 1e3, b) }
 func BenchmarkSqrt2Prec10000(b *testing.B)  { benchmarkSqrt(2, 1e4, b) }

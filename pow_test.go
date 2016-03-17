@@ -95,13 +95,13 @@ func benchmarkPow(prec uint, exp int, b *testing.B) {
 	}
 }
 
-func BenchmarkPow2Prec10(b *testing.B)     { benchmarkPow(1e1, 2, b) }
+func BenchmarkPow2Prec53(b *testing.B)     { benchmarkPow(53, 2, b) }
 func BenchmarkPow2Prec100(b *testing.B)    { benchmarkPow(1e2, 2, b) }
 func BenchmarkPow2Prec1000(b *testing.B)   { benchmarkPow(1e3, 2, b) }
 func BenchmarkPow2Prec10000(b *testing.B)  { benchmarkPow(1e4, 2, b) }
 func BenchmarkPow2Prec100000(b *testing.B) { benchmarkPow(1e5, 2, b) }
 
-func BenchmarkPow31Prec10(b *testing.B)     { benchmarkPow(1e1, 31, b) }
+func BenchmarkPow31Prec53(b *testing.B)     { benchmarkPow(53, 31, b) }
 func BenchmarkPow31Prec100(b *testing.B)    { benchmarkPow(1e2, 31, b) }
 func BenchmarkPow31Prec1000(b *testing.B)   { benchmarkPow(1e3, 31, b) }
 func BenchmarkPow31Prec10000(b *testing.B)  { benchmarkPow(1e4, 31, b) }
