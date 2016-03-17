@@ -150,10 +150,8 @@ func benchmarkLog(num float64, prec uint, b *testing.B) {
 	}
 }
 
-func BenchmarkLog2Prec53(b *testing.B)    { benchmarkLog(2, 53, b) }
-func BenchmarkLog2Prec64(b *testing.B)    { benchmarkLog(2, 64, b) }
-func BenchmarkLog2Prec100(b *testing.B)   { benchmarkLog(2, 1e2, b) }
-func BenchmarkLog2Prec250(b *testing.B)   { benchmarkLog(2, 250, b) }
-func BenchmarkLog2Prec500(b *testing.B)   { benchmarkLog(2, 500, b) }
-func BenchmarkLog2Prec1000(b *testing.B)  { benchmarkLog(2, 1e3, b) }
-func BenchmarkLog2Prec10000(b *testing.B) { benchmarkLog(2, 1e4, b) }
+func BenchmarkLog2Prec53(b *testing.B)     { benchmarkLog(2, 53, b) }
+func BenchmarkLog2Prec100(b *testing.B)    { benchmarkLog(2, 1e2, b) }
+func BenchmarkLog2Prec1000(b *testing.B)   { benchmarkLog(2, 1e3, b) }
+func BenchmarkLog2Prec10000(b *testing.B)  { benchmarkLog(2, 1e4, b) }
+func BenchmarkLog2Prec100000(b *testing.B) { benchmarkLog(2, 1e5, b) }
