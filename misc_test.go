@@ -53,3 +53,33 @@ func TestPi(t *testing.T) {
 	}
 
 }
+
+// ---------- Benchmarks ----------
+
+func benchmarkAgm(xf, yf float64, prec uint, b *testing.B) {
+	b.ReportAllocs()
+	x := new(big.Float).SetPrec(prec).SetFloat64(xf)
+	y := new(big.Float).SetPrec(prec).SetFloat64(yf)
+	for n := 0; n < b.N; n++ {
+		agm(x, y)
+	}
+}
+
+func BenchmarkAgmPrec53(b *testing.B)     { benchmarkAgm(1, 0.125, 53, b) }
+func BenchmarkAgmPrec100(b *testing.B)    { benchmarkAgm(1, 0.125, 1e2, b) }
+func BenchmarkAgmPrec1000(b *testing.B)   { benchmarkAgm(1, 0.125, 1e3, b) }
+func BenchmarkAgmPrec10000(b *testing.B)  { benchmarkAgm(1, 0.125, 1e4, b) }
+func BenchmarkAgmPrec100000(b *testing.B) { benchmarkAgm(1, 0.125, 1e5, b) }
+
+func benchmarkPi(prec uint, b *testing.B) {
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		pi(prec)
+	}
+}
+
+func BenchmarkPiPrec53(b *testing.B)     { benchmarkPi(53, b) }
+func BenchmarkPiPrec100(b *testing.B)    { benchmarkPi(1e2, b) }
+func BenchmarkPiPrec1000(b *testing.B)   { benchmarkPi(1e3, b) }
+func BenchmarkPiPrec10000(b *testing.B)  { benchmarkPi(1e4, b) }
+func BenchmarkPiPrec100000(b *testing.B) { benchmarkPi(1e5, b) }

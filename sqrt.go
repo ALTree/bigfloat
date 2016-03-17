@@ -60,8 +60,8 @@ func Sqrt(z *big.Float) *big.Float {
 		t.Mul(x, x)     // t = x²
 		t.Mul(t, z)     // t = zx²
 		t.Sub(three, t) // t = 3 - zx²
-		t.Mul(t, half)
-		x.Mul(x, t)
+		t.Mul(t, half)  // t = 0.5(3 - zx²)
+		x.Mul(x, t)     // x = 0.5x(3 - zx²)
 	}
 
 	// sqrt(z) = z * (1/sqrt(z))

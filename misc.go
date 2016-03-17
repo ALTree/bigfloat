@@ -6,17 +6,15 @@ import (
 )
 
 // agm returns the arithmetic-geometric mean of a and b, to
-// max(a.Prec, b.Prec) bits of precision.
+// max(a.Prec, b.Prec) bits of precision. a and b must have
+// the same precision.
 func agm(a, b *big.Float) *big.Float {
 
-	var prec uint
-	if a.Prec() > b.Prec() {
-		prec = a.Prec()
-	} else {
-		prec = b.Prec()
+	if a.Prec() != b.Prec() {
+		panic("agm: different precisions")
 	}
 
-	prec += 64
+	var prec uint = a.Prec() + 64
 
 	half := new(big.Float).SetPrec(prec).SetFloat64(0.5)
 
@@ -55,8 +53,8 @@ func pi(prec uint) *big.Float {
 	temp := new(big.Float)
 
 	a := new(big.Float).SetPrec(precExt).SetInt64(1)      // a_0 = 1
-	b := new(big.Float).Quo(one, Sqrt(two))               // b_0 = 1 / sqrt(2)
-	t := new(big.Float).SetPrec(precExt).SetFloat64(0.25) // t_0 = 1 / 4
+	b := new(big.Float).Quo(one, Sqrt(two))               // b_0 = 1/sqrt(2)
+	t := new(big.Float).SetPrec(precExt).SetFloat64(0.25) // t_0 = 1/4
 	p := new(big.Float).SetPrec(precExt).SetInt64(1)      // p_0 = 1
 
 	steps := math.Log2(float64(precExt))
@@ -76,7 +74,7 @@ func pi(prec uint) *big.Float {
 
 	temp.Add(a, b)
 	temp.Mul(temp, temp)
-	res := new(big.Float).Quo(temp, t.Mul(four, t)) // pi = (a_{n+1} + b_{n+1})² / (4 * t_{n+1})
+	res := new(big.Float).Quo(temp, t.Mul(four, t)) // pi = (a_{n+1} + b_{n+1})² / (4t_{n+1})
 
 	return res.SetPrec(prec)
 }
