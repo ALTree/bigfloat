@@ -76,6 +76,7 @@ func TestSqrt32Small(t *testing.T) {
 		}
 	}
 }
+
 func TestSqrt32Big(t *testing.T) {
 	for i := 0; i < 1e5; i++ {
 		r := rand.Float32() * 1e30

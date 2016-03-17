@@ -35,13 +35,11 @@ func TestAgm(t *testing.T) {
 				t.Errorf("prec = %d, Agm(%v, %v) =\ngot  %g;\nwant %g", prec, test.a, test.b, z, want)
 			}
 		}
-
 	}
 }
 
 func TestPi(t *testing.T) {
 	piStr := "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153644"
-
 	for _, prec := range []uint{24, 53, 64, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000} {
 
 		want := new(big.Float).SetPrec(prec)
@@ -49,18 +47,9 @@ func TestPi(t *testing.T) {
 
 		z := pi(prec)
 
-		wantMaxPrec, _, err := big.ParseFloat(piStr, 0, maxPrec, big.ToNearestEven)
-		if err != nil {
-			t.Errorf("prec = %d, parse(%s): %v", maxPrec, want, err)
-		}
-		acc := big.Accuracy(want.Cmp(wantMaxPrec))
-
-		z.SetPrec(prec)
-
 		if z.Cmp(want) != 0 {
-			t.Errorf("pi(%d) = %g (%v); want %g (%v)", prec, z, z.Acc(), want, acc)
+			t.Errorf("Pi(%d) =\ngot  %g;\nwant %g", prec, z, want)
 		}
-
 	}
 
 }
