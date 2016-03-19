@@ -10,7 +10,7 @@ Package floats provides the implementation of a few additional operations (squar
 go get github.com/ALTree/floats
 ```
 
-Please note that `floats` requires Go > 1.5 (since the `big.Float` type is not available in previous versions). 
+Please note that `floats` requires Go >= 1.5 (since the `big.Float` type is not available in previous versions). 
 
 #### Example
 
