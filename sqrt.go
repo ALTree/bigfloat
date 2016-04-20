@@ -29,9 +29,9 @@ func Sqrt(z *big.Float) *big.Float {
 
 	prec := z.Prec() + 64 // guard digits
 
-	half := new(big.Float).SetPrec(prec).SetFloat64(0.5)
-	one := new(big.Float).SetPrec(prec).SetInt64(1)
-	three := new(big.Float).SetPrec(prec).SetInt64(3)
+	half := new(big.Float).SetFloat64(0.5)
+	one := new(big.Float).SetInt64(1)
+	three := new(big.Float).SetInt64(3)
 
 	// Compute sqrt(z) via 1/sqrt(z) to avoid divisions.
 	// Applying Newton to (1/x²) - z = 0 gives

@@ -41,11 +41,16 @@ func agm(a, b *big.Float) *big.Float {
 	return checkA
 }
 
-// Parse and cache pi to 1064 binary digits.
 var piCache *big.Float
+var piCachePrec uint
+var enablePiCache bool = true
 
 func init() {
-	piCache, _, _ = new(big.Float).SetPrec(1e4+64).Parse("3."+
+	if !enablePiCache {
+		return
+	}
+
+	piCache, _, _ = new(big.Float).SetPrec(1024).Parse("3."+
 		"14159265358979323846264338327950288419716939937510"+
 		"58209749445923078164062862089986280348253421170679"+
 		"82148086513282306647093844609550582231725359408128"+
@@ -53,12 +58,14 @@ func init() {
 		"44288109756659334461284756482337867831652712019091"+
 		"45648566923460348610454326648213393607260249141273"+
 		"72458700660631558817488152092096282925409171536444", 10)
+
+	piCachePrec = 1024
 }
 
 // pi returns pi to prec bits of precision
 func pi(prec uint) *big.Float {
 
-	if prec <= 1064 {
+	if prec <= piCachePrec && enablePiCache {
 		return new(big.Float).Copy(piCache).SetPrec(prec)
 	}
 
@@ -93,6 +100,12 @@ func pi(prec uint) *big.Float {
 	temp.Add(a, b)
 	temp.Mul(temp, temp)
 	res := new(big.Float).Quo(temp, t.Mul(four, t)) // pi = (a_{n+1} + b_{n+1})² / (4t_{n+1})
+	res.SetPrec(prec)
 
-	return res.SetPrec(prec)
+	if enablePiCache {
+		piCache.Copy(res)
+		piCachePrec = prec
+	}
+
+	return res
 }
