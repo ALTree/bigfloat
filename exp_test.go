@@ -33,3 +33,19 @@ func TestExp(t *testing.T) {
 		}
 	}
 }
+
+// ---------- Benchmarks ----------
+
+func benchmarkExp(num float64, prec uint, b *testing.B) {
+	b.ReportAllocs()
+	x := new(big.Float).SetPrec(prec).SetFloat64(num)
+	for n := 0; n < b.N; n++ {
+		floats.Exp(x)
+	}
+}
+
+func BenchmarkExp2Prec53(b *testing.B)     { benchmarkExp(2, 53, b) }
+func BenchmarkExp2Prec100(b *testing.B)    { benchmarkExp(2, 1e2, b) }
+func BenchmarkExp2Prec1000(b *testing.B)   { benchmarkExp(2, 1e3, b) }
+func BenchmarkExp2Prec10000(b *testing.B)  { benchmarkExp(2, 1e4, b) }
+func BenchmarkExp2Prec100000(b *testing.B) { benchmarkExp(2, 1e5, b) }
