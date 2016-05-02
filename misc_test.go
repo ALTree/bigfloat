@@ -39,6 +39,7 @@ func TestAgm(t *testing.T) {
 }
 
 func TestPi(t *testing.T) {
+	enablePiCache = false
 	piStr := "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153644"
 	for _, prec := range []uint{24, 53, 64, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000} {
 
@@ -51,7 +52,7 @@ func TestPi(t *testing.T) {
 			t.Errorf("Pi(%d) =\ngot  %g;\nwant %g", prec, z, want)
 		}
 	}
-
+	enablePiCache = true
 }
 
 // ---------- Benchmarks ----------
@@ -72,10 +73,12 @@ func BenchmarkAgmPrec10000(b *testing.B)  { benchmarkAgm(1, 0.125, 1e4, b) }
 func BenchmarkAgmPrec100000(b *testing.B) { benchmarkAgm(1, 0.125, 1e5, b) }
 
 func benchmarkPi(prec uint, b *testing.B) {
+	enablePiCache = false
 	b.ReportAllocs()
 	for n := 0; n < b.N; n++ {
 		pi(prec)
 	}
+	enablePiCache = true
 }
 
 func BenchmarkPiPrec53(b *testing.B)     { benchmarkPi(53, b) }
