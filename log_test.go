@@ -95,7 +95,7 @@ func TestLog64(t *testing.T) {
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floats.Log(x).Float64()
 		want := math.Log(r)
-		if math.Abs(z-want) > 1e-14 || acc != big.Exact {
+		if math.Abs(z-want)/want > 1e-14 || acc != big.Exact {
 			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z, acc, want)
 		}
 	}
@@ -107,7 +107,7 @@ func TestLog64Small(t *testing.T) {
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floats.Log(x).Float64()
 		want := math.Log(r)
-		if math.Abs(z-want) > 1e-12 || acc != big.Exact { // 1e-12 for very small values
+		if math.Abs(z-want)/want > 1e-14 || acc != big.Exact { // 1e-12 for very small values
 			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z, acc, want)
 		}
 	}
@@ -119,7 +119,7 @@ func TestLog64Big(t *testing.T) {
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floats.Log(x).Float64()
 		want := math.Log(r)
-		if math.Abs(z-want) > 1e-14 || acc != big.Exact {
+		if math.Abs(z-want)/want > 1e-14 || acc != big.Exact {
 			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z, acc, want)
 		}
 	}

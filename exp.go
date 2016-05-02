@@ -14,10 +14,6 @@ func Exp(z *big.Float) *big.Float {
 		return big.NewFloat(1).SetPrec(z.Prec())
 	}
 
-	if z.Sign() == -1 {
-		panic("exp(z) is not implemented")
-	}
-
 	var prec uint = 32
 	var guard uint = 64
 
@@ -25,14 +21,16 @@ func Exp(z *big.Float) *big.Float {
 
 	// get initial estimate using IEEE-754 math
 	zf, _ := z.Float64()
-	if zfs := math.Exp(zf); zfs != 0 {
+	if zfs := math.Exp(zf); zfs != 0 && zfs != math.Inf(+1) {
 		x.SetFloat64(zfs)
 	} else {
-		panic("mat.Exp(zf) == 0 (not implemented)")
+		panic("mat.Exp(zf) == +Inf or Zero (not implemented)")
 	}
 
 	t := new(big.Float).SetPrec(prec + guard)
 
+	// Solve log(x) - z = 0 for x to find exp(z)
+	// using Newton.
 	for prec < 2*z.Prec() {
 		t = Log(x)  // t = log(x_n)
 		t.Sub(t, z) // t = log(x_n) - z
