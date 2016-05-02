@@ -1,7 +1,6 @@
 package floats_test
 
 import (
-	"math"
 	"math/big"
 	"testing"
 
@@ -10,75 +9,64 @@ import (
 
 func TestPow(t *testing.T) {
 	for _, test := range []struct {
-		x    string
-		n    int
+		z, w string
 		want string
 	}{
-		{"1.0", 2, "1.0"},
-		{"2.0", 8, "256.0"},
-		{"2.5", 8, "1525.87890625"},
-		{"3e5", 4, "8.1e21"},
-		{"0.125", 4, "0.000244140625"},
+		{"1.5", "1.5", "1.8371173070873835736479630560294185439744606104925025963245194254382202830929862699048945748284801761139459509199606418436441490948783180062193379634279589146216845606457574284357225789531838276676109830092400181402243325144092030253566067045309391758849310432709781082027026621306513787250611923558785098172755465204952231278685708006003328040156619"},
+		{"2", "1.5", "2.8284271247461900976033774484193961571393437507538961463533594759814649569242140777007750686552831454700276924618245940498496721117014744252882429941998716628264453318550111855115999010023055641211429402191199432119405490691937240294570348372817783972191046584609686174286429016795252072559905028159793745067930926636176592812412305167047901094915006"},
+
+		{"1.5", "-1.5", "0.54433105395181735515495201660130919821465499570148225076282057050021341721273667256441320735658671884857657805035870869441308121329727940925017421138606190062864727722837257138836224561575817116077362459533037574525165407834346756306862420874990790396590549430251203206006004803871151962224035329063066957548905082088747351936846542240009860859723315"},
+		{"2", "-1.5", "0.35355339059327376220042218105242451964241796884423701829416993449768311961552675971259688358191039318375346155772807425623120901396268430316103037427498395785330566648187639818894998762528819551514286752738999290149256863364921550368212935466022229965238808230762107717858036270994065090699881285199742181334913658295220741015515381458809876368643757"},
 	} {
 		for _, prec := range []uint{24, 53, 64, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000} {
 			want := new(big.Float).SetPrec(prec)
 			want.Parse(test.want, 10)
 
-			x := new(big.Float).SetPrec(prec)
-			x.Parse(test.x, 10)
+			z := new(big.Float).SetPrec(prec)
+			z.Parse(test.z, 10)
+			w := new(big.Float).SetPrec(prec)
+			w.Parse(test.w, 10)
 
-			z := floats.Pow(x, test.n)
+			x := floats.Pow(z, w)
 
-			if z.Cmp(want) != 0 {
-				t.Errorf("prec = %d, Pow(%v, %d) =\ngot  %g;\nwant %g", prec, test.x, test.n, z, want)
+			if x.Cmp(want) != 0 {
+				t.Errorf("prec = %d, Pow(%v, %v) =\ngot  %g;\nwant %g", prec, test.z, test.w, x, want)
 			}
 		}
 	}
 }
 
-func TestPowSpecialValues(t *testing.T) {
-	for i, test := range []struct {
-		f float64
-		n int
+func TestPowIntegers(t *testing.T) {
+	for _, test := range []struct {
+		z, w string
+		want string
 	}{
-		{0.0, 2},
-		{1.0, 2},
-		{math.Inf(+1), 2},
-		{math.Inf(+1), 3},
+		{"2", "5", "32"},
+		{"2", "10", "1024"},
+		{"2", "64", "18446744073709551616"},
 
-		{-0.0, 2},
-		{-1.0, 2},
+		{"2", "-5", "0.03125"},
+		{"2", "-10", "0.0009765625"},
+		{"2", "-64", "5.42101086242752217003726400434970855712890625e-20"},
 
-		{-0.0, 3},
-		{-1.0, 3},
+		{"1.5", "8", "25.62890625"},
 	} {
-		x := big.NewFloat(test.f).SetPrec(53)
-		z, acc := floats.Pow(x, test.n).Float64()
-		want := math.Pow(test.f, float64(test.n))
-		if z != want {
-			t.Errorf("%d) Pow(%g) =\n got %b (%s);\nwant %b (Exact)", i, test.f, z, acc, want)
+		for _, prec := range []uint{24, 53, 64, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000} {
+			want := new(big.Float).SetPrec(prec)
+			want.Parse(test.want, 10)
+
+			z := new(big.Float).SetPrec(prec)
+			z.Parse(test.z, 10)
+			w := new(big.Float).SetPrec(prec)
+			w.Parse(test.w, 10)
+
+			x := floats.Pow(z, w)
+
+			if x.Cmp(want) != 0 {
+				t.Errorf("prec = %d, Pow(%v, %v) =\ngot  %g;\nwant %g", prec, test.z, test.w, x, want)
+			}
 		}
 	}
 }
 
 // ---------- Benchmarks ----------
-
-func benchmarkPow(prec uint, exp int, b *testing.B) {
-	b.ReportAllocs()
-	x := new(big.Float).SetPrec(prec).SetFloat64(2.5)
-	for n := 0; n < b.N; n++ {
-		floats.Pow(x, exp)
-	}
-}
-
-func BenchmarkPow2Prec53(b *testing.B)     { benchmarkPow(53, 2, b) }
-func BenchmarkPow2Prec100(b *testing.B)    { benchmarkPow(1e2, 2, b) }
-func BenchmarkPow2Prec1000(b *testing.B)   { benchmarkPow(1e3, 2, b) }
-func BenchmarkPow2Prec10000(b *testing.B)  { benchmarkPow(1e4, 2, b) }
-func BenchmarkPow2Prec100000(b *testing.B) { benchmarkPow(1e5, 2, b) }
-
-func BenchmarkPow31Prec53(b *testing.B)     { benchmarkPow(53, 31, b) }
-func BenchmarkPow31Prec100(b *testing.B)    { benchmarkPow(1e2, 31, b) }
-func BenchmarkPow31Prec1000(b *testing.B)   { benchmarkPow(1e3, 31, b) }
-func BenchmarkPow31Prec10000(b *testing.B)  { benchmarkPow(1e4, 31, b) }
-func BenchmarkPow31Prec100000(b *testing.B) { benchmarkPow(1e5, 31, b) }

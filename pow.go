@@ -2,49 +2,68 @@ package floats
 
 import "math/big"
 
-// Pow returns a big.Float representation of z**n. Precision is the same as the one
-// of the first argument. The function panics when n is negative.
-func Pow(z *big.Float, n int) *big.Float {
+// Pow returns a big.Float representation of z**w. Precision is the same as the one
+// of the first argument. The function panics when z is negative.
+func Pow(z *big.Float, w *big.Float) *big.Float {
 
-	if n < 0 {
-		panic("Pow: negative power")
+	if z.Sign() < 0 {
+		panic("Pow: negative base")
 	}
 
 	// Pow(z, 0) = 1.0
-	if n == 0 {
-		return new(big.Float).SetPrec(z.Prec()).SetFloat64(1.0)
+	if w.Sign() == 0 {
+		return big.NewFloat(1).SetPrec(z.Prec())
 	}
 
 	// Pow(z, 1) = z
 	// Pow(+Inf, n) = +Inf
-	if n == 1 || z.IsInf() {
+	if w.Cmp(big.NewFloat(1)) == 0 || z.IsInf() {
 		x := new(big.Float)
 		return x.Copy(z)
 	}
 
-	// Pow(-Inf, n) gives error
-	if z.Signbit() && z.IsInf() {
-		panic("Pow: -Inf base")
+	// Pow(z, -w) = 1 / Pow(z, w)
+	if w.Sign() < 0 {
+		x := new(big.Float)
+		zExt := new(big.Float).Copy(z).SetPrec(z.Prec() + 64)
+		return x.Quo(big.NewFloat(1), Pow(zExt, w.Neg(w))).SetPrec(z.Prec())
 	}
+
+	// w integer fast path
+	if w.IsInt() {
+		wi, _ := w.Int64()
+		return powInt(z, int(wi))
+	}
+
+	x := new(big.Float).SetPrec(z.Prec() + 64)
+	logZ := Log(new(big.Float).Copy(z).SetPrec(z.Prec() + 64))
+	x.Mul(w, logZ)
+	x = Exp(x)
+	return x.SetPrec(z.Prec())
+
+}
+
+// fast path for z**w when w is an integer
+func powInt(z *big.Float, w int) *big.Float {
 
 	// get mantissa and exponent of z
 	mant := new(big.Float)
 	exp := z.MantExp(mant)
 
 	// result's exponent
-	exp = exp * n
+	exp = exp * w
 
 	// result's mantissa
 	x := new(big.Float).SetPrec(z.Prec()).SetFloat64(1.0)
 
 	// Classic right-to-left binary exponentiation
-	for n > 0 {
-		if n%2 == 1 {
+	for w > 0 {
+		if w%2 == 1 {
 			x.Mul(x, mant)
 		}
-		n >>= 1
+		w >>= 1
 		mant.Mul(mant, mant)
 	}
 
-	return new(big.Float).SetPrec(z.Prec()).SetMantExp(x, exp)
+	return new(big.Float).SetMantExp(x, exp).SetPrec(z.Prec())
 }

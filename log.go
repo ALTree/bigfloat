@@ -52,7 +52,7 @@ func Log(z *big.Float) *big.Float {
 	// Double x until the condition is met, and keep track of
 	// the number of doubling we did (needed to scale back later).
 
-	lim := Pow(two, int(prec/2))
+	lim := powInt(two, int(prec/2))
 
 	k := 0
 	for x.Cmp(lim) < 0 {
@@ -77,7 +77,7 @@ func Log(z *big.Float) *big.Float {
 	}
 
 	// scale the result back dividing by 2**k
-	x.Quo(x, Pow(two, k))
+	x.Quo(x, powInt(two, k))
 
 	return x.SetPrec(z.Prec())
 }
