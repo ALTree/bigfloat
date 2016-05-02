@@ -16,12 +16,12 @@ func Exp(z *big.Float) *big.Float {
 	}
 
 	// Exp(+Inf) = +Inf
-	if z.IsInf() {
+	if z.IsInf() && z.Sign() > 0 {
 		return big.NewFloat(math.Inf(+1)).SetPrec(z.Prec())
 	}
 
 	// Exp(-Inf) = 0
-	if z.IsInf() {
+	if z.IsInf() && z.Sign() < 0 {
 		return big.NewFloat(0).SetPrec(z.Prec())
 	}
 
