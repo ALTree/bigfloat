@@ -100,7 +100,7 @@ func TestSqrtFloat64Big(t *testing.T) {
 }
 
 func TestSqrtSpecialValues(t *testing.T) {
-	for i, f := range []float64{
+	for _, f := range []float64{
 		+0.0,
 		-0.0,
 		math.Inf(+1),
@@ -109,7 +109,7 @@ func TestSqrtSpecialValues(t *testing.T) {
 		z, acc := floats.Sqrt(x).Float64()
 		want := math.Sqrt(f)
 		if z != want || acc != big.Exact {
-			t.Errorf("%d) Sqrt(%g) =\n got %b (%s);\nwant %b (Exact)", i, f, z, acc, want)
+			t.Errorf("Sqrt(%g) =\n got %g (%s);\nwant %g (Exact)", f, z, acc, want)
 		}
 	}
 }

@@ -3,14 +3,10 @@ package floats_test
 import (
 	"math"
 	"math/big"
-	"math/rand"
 	"testing"
 
 	"github.com/ALTree/floats"
 )
-
-// See note in sqrt_test.go about which numbers
-// can we safely test this way.
 
 func TestPow(t *testing.T) {
 	for _, test := range []struct {
@@ -18,8 +14,6 @@ func TestPow(t *testing.T) {
 		n    int
 		want string
 	}{
-		// 350 decimal digits are enough to give us up to
-		// 1000 binary digits. Useless for now, but leave it.
 		{"1.0", 2, "1.0"},
 		{"2.0", 8, "256.0"},
 		{"2.5", 8, "1525.87890625"},
@@ -41,24 +35,6 @@ func TestPow(t *testing.T) {
 		}
 	}
 }
-
-func testPow64(n int, t *testing.T) {
-	for i := 0; i < 2e5; i++ {
-		r := rand.Float64() * 1e5
-		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floats.Pow(x, n).Float64()
-		want := math.Pow(r, float64(n))
-		if z != want {
-			t.Errorf("Pow(%g, %d) =\n got %b (%s);\nwant %b (Exact)", x, n, z, acc, want)
-		}
-	}
-}
-
-func TestPow64Exp2(t *testing.T)   { testPow64(2, t) }
-func TestPow64Exp16(t *testing.T)  { testPow64(16, t) }
-func TestPow64Exp27(t *testing.T)  { testPow64(27, t) }
-func TestPow64Exp63(t *testing.T)  { testPow64(63, t) }
-func TestPow64Exp100(t *testing.T) { testPow64(100, t) }
 
 func TestPowSpecialValues(t *testing.T) {
 	for i, test := range []struct {

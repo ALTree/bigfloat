@@ -57,12 +57,12 @@ func testExpFloat64(scale float64, nTests int, t *testing.T) {
 
 		want := math.Exp(r)
 
-		// Unfortunately, the Go math.Log function is not completely
+		// Unfortunately, the Go math.Exp function is not completely
 		// accurate, so it doesn't make sense to require 100%
-		// compatibility with it, since it happens that math.Log
-		// returns a result with the last bit off (see Issue #9546).
+		// compatibility with it, since it happens that math.Exp
+		// returns a result with the last bit off (same as math.Log).
 		//
-		// Just require a relative error smaller than 1e-14
+		// Just require a relative error smaller than 1e-14.
 		if math.Abs(z64-want)/want > 1e-14 || acc != big.Exact {
 			t.Errorf("Exp(%g) =\n got %g (%s);\nwant %g (Exact)", x, z64, acc, want)
 		}

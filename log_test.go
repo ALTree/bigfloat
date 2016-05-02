@@ -58,7 +58,7 @@ func testLogFloat64(scale float64, nTests int, t *testing.T) {
 		// compatibility with it, since it happens that math.Log
 		// returns a result with the last bit off (see Issue #9546).
 		//
-		// Just require a relative error smaller than 1e-14
+		// Just require a relative error smaller than 1e-14.
 		if math.Abs(z64-want)/want > 1e-14 || acc != big.Exact {
 			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z64, acc, want)
 		}
@@ -81,7 +81,7 @@ func TestLogFloat64Big(t *testing.T) {
 }
 
 func TestLogSpecialValues(t *testing.T) {
-	for i, f := range []float64{
+	for _, f := range []float64{
 		+0.0,
 		-0.0,
 		math.Inf(+1),
@@ -90,7 +90,7 @@ func TestLogSpecialValues(t *testing.T) {
 		z, acc := floats.Log(x).Float64()
 		want := math.Log(f)
 		if z != want || acc != big.Exact {
-			t.Errorf("%d) Log(%f) =\n got %b (%s);\nwant %b (Exact)", i, f, z, acc, want)
+			t.Errorf("Log(%f) =\n got %g (%s);\nwant %g (Exact)", f, z, acc, want)
 		}
 	}
 }
