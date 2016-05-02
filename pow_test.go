@@ -1,7 +1,9 @@
 package floats_test
 
 import (
+	"math"
 	"math/big"
+	"math/rand"
 	"testing"
 
 	"github.com/ALTree/floats"
@@ -67,6 +69,46 @@ func TestPowIntegers(t *testing.T) {
 			}
 		}
 	}
+}
+
+func testPowFloat64(scale float64, nTests int, t *testing.T) {
+	for i := 0; i < nTests; i++ {
+		r1 := math.Abs(rand.Float64() * scale) // base always > 0
+		r2 := rand.Float64() * scale
+
+		z := big.NewFloat(r1).SetPrec(53)
+		w := big.NewFloat(r2).SetPrec(53)
+
+		x64, acc := floats.Pow(z, w).Float64()
+
+		want := math.Pow(r1, r2)
+
+		// Unfortunately, the Go math.Pow function is not completely
+		// accurate, so it doesn't make sense to require 100%
+		// compatibility with it, since it happens that math.Pow
+		// returns a result with the last bit off (same as math.Log).
+		//
+		// Just require a relative error smaller than 1e-14.
+		if math.Abs(x64-want)/want > 1e-14 || acc != big.Exact {
+			t.Errorf("Pow(%g, %g) =\n got %g (%s);\nwant %g (Exact)", z, w, x64, acc, want)
+		}
+	}
+}
+
+func TestPowFloat64Small(t *testing.T) {
+	testPowFloat64(-100, 1e3, t)
+	testPowFloat64(-10, 1e3, t)
+	testPowFloat64(-1, 1e3, t)
+}
+
+func TestPowFloat64Medium(t *testing.T) {
+	testPowFloat64(0.1, 4e3, t)
+	testPowFloat64(1, 4e3, t)
+}
+
+func TestPowFloat64Big(t *testing.T) {
+	testPowFloat64(10, 4e3, t)
+	testPowFloat64(100, 4e3, t)
 }
 
 // ---------- Benchmarks ----------

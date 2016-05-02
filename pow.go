@@ -26,7 +26,8 @@ func Pow(z *big.Float, w *big.Float) *big.Float {
 	if w.Sign() < 0 {
 		x := new(big.Float)
 		zExt := new(big.Float).Copy(z).SetPrec(z.Prec() + 64)
-		return x.Quo(big.NewFloat(1), Pow(zExt, w.Neg(w))).SetPrec(z.Prec())
+		wNeg := new(big.Float).Copy(w).Neg(w)
+		return x.Quo(big.NewFloat(1), Pow(zExt, wNeg)).SetPrec(z.Prec())
 	}
 
 	// w integer fast path
