@@ -6,12 +6,23 @@ import (
 )
 
 // Exp returns a big.Float representation of exp(z). Precision is
-// the same as the one of the argument.
+// the same as the one of the argument. The function returns +Inf
+// when z = +Inf, and 0 when z = -Inf.
 func Exp(z *big.Float) *big.Float {
 
 	// exp(0) == 1
 	if z.Sign() == 0 {
 		return big.NewFloat(1).SetPrec(z.Prec())
+	}
+
+	// Exp(+Inf) = +Inf
+	if z.IsInf() {
+		return big.NewFloat(math.Inf(+1)).SetPrec(z.Prec())
+	}
+
+	// Exp(-Inf) = 0
+	if z.IsInf() {
+		return big.NewFloat(0).SetPrec(z.Prec())
 	}
 
 	x := new(big.Float)
