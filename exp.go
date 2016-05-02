@@ -14,20 +14,25 @@ func Exp(z *big.Float) *big.Float {
 		return big.NewFloat(1).SetPrec(z.Prec())
 	}
 
-	var prec uint = 32
-	var guard uint = 64
+	x := new(big.Float)
 
-	x := new(big.Float).SetPrec(prec + guard)
-
-	// get initial estimate using IEEE-754 math
+	// try to get initial estimate using IEEE-754 math
 	zf, _ := z.Float64()
-	if zfs := math.Exp(zf); zfs != 0 && zfs != math.Inf(+1) {
-		x.SetFloat64(zfs)
+	if zfs := math.Exp(zf); zfs == math.Inf(+1) || zfs == 0 {
+		// too big for IEEE-754 math, perform
+		// argument reduction using e^{2x} = (e^x)²
+		halfZ := new(big.Float).Set(z).SetPrec(z.Prec() + 64)
+		halfZ.Quo(z, big.NewFloat(2))
+		halfExp := Exp(halfZ)
+		return x.Mul(halfExp, halfExp).SetPrec(z.Prec())
 	} else {
-		panic("mat.Exp(zf) == +Inf or Zero (not implemented)")
+		// we got a nice IEEE-754 estimate
+		x.SetFloat64(zfs)
 	}
 
-	t := new(big.Float).SetPrec(prec + guard)
+	var prec uint = 32
+
+	t := new(big.Float).SetPrec(prec + 64) // guard digits
 
 	// Solve log(x) - z = 0 for x to find exp(z)
 	// using Newton.
@@ -37,7 +42,7 @@ func Exp(z *big.Float) *big.Float {
 		t.Mul(t, x) // t = x_n * (log(x_n) - z)
 		x.Sub(x, t) // x_{n+1} = x_n - x_n * (log(x_n) - z)
 		prec *= 2
-		x.SetPrec(prec + guard)
+		x.SetPrec(prec + 64)
 	}
 
 	return x.SetPrec(z.Prec())
