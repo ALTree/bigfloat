@@ -44,85 +44,40 @@ func TestLog(t *testing.T) {
 	}
 }
 
-func TestLog32(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float32() * 1e3
-		x := big.NewFloat(float64(r)).SetPrec(24)
-		z, acc := floats.Log(x).Float32()
-		want := math.Log(float64(r))
-		if z != float32(want) || acc != big.Exact {
-			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
-		}
-	}
-}
+func testLogFloat64(scale float64, nTests int, t *testing.T) {
+	for i := 0; i < nTests; i++ {
+		r := rand.Float64() * scale
 
-func TestLog32Small(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float32() * 1e-30
-		x := big.NewFloat(float64(r)).SetPrec(24)
-		z, acc := floats.Log(x).Float32()
-		want := math.Log(float64(r))
-		if z != float32(want) || acc != big.Exact {
-			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
-		}
-	}
-}
-
-func TestLog32Big(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float32() * 1e30
-		x := big.NewFloat(float64(r)).SetPrec(24)
-		z, acc := floats.Log(x).Float32()
-		want := math.Log(float64(r))
-		if z != float32(want) || acc != big.Exact {
-			t.Errorf("Log(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
-		}
-	}
-}
-
-// Unfortunately, the Go math.Log function is not completely
-// accurate, so it doesn't make sense to require 100%
-// compatibility with it, since it happens that math.Log
-// returns a result with the last bit off (see Issue #9546).
-//
-// For this reason, we just require that the result is
-// within distance 1e-14 from what math.Log returns
-// (1e-12 for very small values).
-// TODO: figure out a good permitted error.
-func TestLog64(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float64() * 1e3
 		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floats.Log(x).Float64()
+		z64, acc := floats.Log(x).Float64()
+
 		want := math.Log(r)
-		if math.Abs(z-want)/want > 1e-14 || acc != big.Exact {
-			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z, acc, want)
+
+		// Unfortunately, the Go math.Log function is not completely
+		// accurate, so it doesn't make sense to require 100%
+		// compatibility with it, since it happens that math.Log
+		// returns a result with the last bit off (see Issue #9546).
+		//
+		// Just require a relative error smaller than 1e-14
+		if math.Abs(z64-want)/want > 1e-14 || acc != big.Exact {
+			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z64, acc, want)
 		}
 	}
 }
 
-func TestLog64Small(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float64() * 1e-300
-		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floats.Log(x).Float64()
-		want := math.Log(r)
-		if math.Abs(z-want)/want > 1e-14 || acc != big.Exact { // 1e-12 for very small values
-			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z, acc, want)
-		}
-	}
+func TestLogFloat64Small(t *testing.T) {
+	testLogFloat64(1e-100, 1e4, t)
+	testLogFloat64(1e-10, 1e4, t)
 }
 
-func TestLog64Big(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float64() * 1e300
-		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floats.Log(x).Float64()
-		want := math.Log(r)
-		if math.Abs(z-want)/want > 1e-14 || acc != big.Exact {
-			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z, acc, want)
-		}
-	}
+func TestLogFloat64Medium(t *testing.T) {
+	testLogFloat64(1, 1e4, t)
+	testLogFloat64(100, 1e4, t)
+}
+
+func TestLogFloat64Big(t *testing.T) {
+	testLogFloat64(1e10, 1e4, t)
+	testLogFloat64(1e100, 1e4, t)
 }
 
 func TestLogSpecialValues(t *testing.T) {

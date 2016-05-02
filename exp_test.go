@@ -48,52 +48,41 @@ func TestExp(t *testing.T) {
 	}
 }
 
-func TestExp32(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float32() * 80
-		x := big.NewFloat(float64(r)).SetPrec(24)
-		z, acc := floats.Exp(x).Float32()
-		want := math.Exp(float64(r))
-		if z != float32(want) {
-			t.Errorf("Exp(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, float32(want))
-		}
-	}
-}
+func testExpFloat64(scale float64, nTests int, t *testing.T) {
+	for i := 0; i < nTests; i++ {
+		r := rand.Float64() * scale
 
-func TestExp32Small(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float32() * 1e-4
-		x := big.NewFloat(float64(r)).SetPrec(24)
-		z, acc := floats.Exp(x).Float32()
-		want := math.Exp(float64(r))
-		if z != float32(want) {
-			t.Errorf("Exp(%f) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, float32(want))
-		}
-	}
-}
-
-func TestExp64(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float64() * 160
 		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floats.Exp(x).Float64()
+		z64, acc := floats.Exp(x).Float64()
+
 		want := math.Exp(r)
-		if math.Abs(z-want)/want > 1e-14 {
-			t.Errorf("Exp(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
+
+		// Unfortunately, the Go math.Log function is not completely
+		// accurate, so it doesn't make sense to require 100%
+		// compatibility with it, since it happens that math.Log
+		// returns a result with the last bit off (see Issue #9546).
+		//
+		// Just require a relative error smaller than 1e-14
+		if math.Abs(z64-want)/want > 1e-14 || acc != big.Exact {
+			t.Errorf("Exp(%g) =\n got %g (%s);\nwant %g (Exact)", x, z64, acc, want)
 		}
 	}
 }
 
-func TestExp64Small(t *testing.T) {
-	for i := 0; i < 1e4; i++ {
-		r := rand.Float64() * 1e-8
-		x := big.NewFloat(r).SetPrec(53)
-		z, acc := floats.Exp(x).Float64()
-		want := math.Exp(r)
-		if math.Abs(z-want)/want > 1e-14 {
-			t.Errorf("Exp(%g) =\n got %b (%s);\nwant %b (Exact)", x, z, acc, want)
-		}
-	}
+func TestExpFloat64Small(t *testing.T) {
+	testExpFloat64(-100, 4e3, t)
+	testExpFloat64(-10, 4e3, t)
+	testExpFloat64(-1, 4e3, t)
+}
+
+func TestExpFloat64Medium(t *testing.T) {
+	testExpFloat64(0.1, 5e3, t)
+	testExpFloat64(1, 5e3, t)
+}
+
+func TestExpFloat64Big(t *testing.T) {
+	testExpFloat64(10, 5e3, t)
+	testExpFloat64(100, 5e3, t)
 }
 
 // ---------- Benchmarks ----------

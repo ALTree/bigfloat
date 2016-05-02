@@ -69,7 +69,7 @@ func TestSqrt(t *testing.T) {
 	}
 }
 
-func testSqrtIEEE(scale float64, nTests int, t *testing.T) {
+func testSqrtFloat64(scale float64, nTests int, t *testing.T) {
 	for i := 0; i < nTests; i++ {
 		r := rand.Float64() * scale
 
@@ -79,24 +79,24 @@ func testSqrtIEEE(scale float64, nTests int, t *testing.T) {
 		want := math.Sqrt(r)
 
 		if z64 != want || acc != big.Exact {
-			t.Errorf("Sqrt(%g) =\n got %g;\nwant %g", x, z64, want)
+			t.Errorf("Sqrt(%g) =\n got %g (%s);\nwant %g (Exact)", x, z64, acc, want)
 		}
 	}
 }
 
-func TestSqrtIEEESmall(t *testing.T) {
-	testSqrtIEEE(1e-100, 1e5, t)
-	testSqrtIEEE(1e-10, 1e5, t)
+func TestSqrtFloat64Small(t *testing.T) {
+	testSqrtFloat64(1e-100, 1e5, t)
+	testSqrtFloat64(1e-10, 1e5, t)
 }
 
-func TestSqrtIEEEMedium(t *testing.T) {
-	testSqrtIEEE(1, 1e5, t)
-	testSqrtIEEE(100, 1e5, t)
+func TestSqrtFloa64Medium(t *testing.T) {
+	testSqrtFloat64(1, 1e5, t)
+	testSqrtFloat64(100, 1e5, t)
 }
 
-func TestSqrtIEEEBig(t *testing.T) {
-	testSqrtIEEE(1e10, 1e5, t)
-	testSqrtIEEE(1e100, 1e5, t)
+func TestSqrtFloat64Big(t *testing.T) {
+	testSqrtFloat64(1e10, 1e5, t)
+	testSqrtFloat64(1e100, 1e5, t)
 }
 
 func TestSqrtSpecialValues(t *testing.T) {
