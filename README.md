@@ -1,6 +1,6 @@
 ### Floats 
 
-Package floats provides the implementation of a few additional operations (square root, exponentiation, natural logarithm) for the standard library `big.Float` type.
+Package floats provides the implementation of a few additional operations (square root, exponentiation, natural logarithm, exponential function) for the standard library `big.Float` type.
 
 [![GoDoc](https://godoc.org/github.com/ALTree/floats?status.png)](https://godoc.org/github.com/ALTree/floats)
 
