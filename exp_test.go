@@ -50,7 +50,7 @@ func TestExp(t *testing.T) {
 
 func TestExp32(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
-		r := rand.Float32() * 100
+		r := rand.Float32() * 80
 		x := big.NewFloat(float64(r)).SetPrec(24)
 		z, acc := floats.Exp(x).Float32()
 		want := math.Exp(float64(r))
@@ -62,7 +62,7 @@ func TestExp32(t *testing.T) {
 
 func TestExp32Small(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
-		r := rand.Float32() * 1e-20
+		r := rand.Float32() * 1e-4
 		x := big.NewFloat(float64(r)).SetPrec(24)
 		z, acc := floats.Exp(x).Float32()
 		want := math.Exp(float64(r))
@@ -74,7 +74,7 @@ func TestExp32Small(t *testing.T) {
 
 func TestExp64(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
-		r := rand.Float64() * 100
+		r := rand.Float64() * 160
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floats.Exp(x).Float64()
 		want := math.Exp(r)
@@ -86,7 +86,7 @@ func TestExp64(t *testing.T) {
 
 func TestExp64Small(t *testing.T) {
 	for i := 0; i < 1e4; i++ {
-		r := rand.Float64() * 1e-20
+		r := rand.Float64() * 1e-8
 		x := big.NewFloat(r).SetPrec(53)
 		z, acc := floats.Exp(x).Float64()
 		want := math.Exp(r)

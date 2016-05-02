@@ -45,8 +45,8 @@ func Exp(z *big.Float) *big.Float {
 
 	t := new(big.Float).SetPrec(prec + 64) // guard digits
 
-	// Solve log(x) - z = 0 for x to find exp(z)
-	// using Newton.
+	// Solve log(x) - z = 0 for x to find exp(z),
+	// using Newton's method.
 	for prec < 2*z.Prec() {
 		t = Log(x)  // t = log(x_n)
 		t.Sub(t, z) // t = log(x_n) - z
