@@ -14,7 +14,7 @@ import (
 
 func TestLog(t *testing.T) {
 	for _, test := range []struct {
-		x    string
+		z    string
 		want string
 	}{
 		// 350 decimal digits are enough to give us up to 1000 binary digits
@@ -32,13 +32,13 @@ func TestLog(t *testing.T) {
 			want := new(big.Float).SetPrec(prec)
 			want.Parse(test.want, 10)
 
-			x := new(big.Float).SetPrec(prec)
-			x.Parse(test.x, 10)
+			z := new(big.Float).SetPrec(prec)
+			z.Parse(test.z, 10)
 
-			z := floats.Log(x)
+			x := floats.Log(z)
 
-			if z.Cmp(want) != 0 {
-				t.Errorf("prec = %d, Log(%v) =\ngot %g;\n want %g", prec, test.x, z, want)
+			if x.Cmp(want) != 0 {
+				t.Errorf("prec = %d, Log(%v) =\ngot %g;\n want %g", prec, test.z, x, want)
 			}
 		}
 	}
@@ -48,8 +48,8 @@ func testLogFloat64(scale float64, nTests int, t *testing.T) {
 	for i := 0; i < nTests; i++ {
 		r := rand.Float64() * scale
 
-		x := big.NewFloat(r).SetPrec(53)
-		z64, acc := floats.Log(x).Float64()
+		z := big.NewFloat(r)
+		x64, acc := floats.Log(z).Float64()
 
 		want := math.Log(r)
 
@@ -59,8 +59,8 @@ func testLogFloat64(scale float64, nTests int, t *testing.T) {
 		// returns a result with the last bit off (see Issue #9546).
 		//
 		// Just require a relative error smaller than 1e-14.
-		if math.Abs(z64-want)/want > 1e-14 || acc != big.Exact {
-			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", x, z64, acc, want)
+		if math.Abs(x64-want)/want > 1e-14 || acc != big.Exact {
+			t.Errorf("Log(%g) =\n got %g (%s);\nwant %g (Exact)", z, x64, acc, want)
 		}
 	}
 }
@@ -86,22 +86,22 @@ func TestLogSpecialValues(t *testing.T) {
 		-0.0,
 		math.Inf(+1),
 	} {
-		x := big.NewFloat(f).SetPrec(53)
-		z, acc := floats.Log(x).Float64()
+		z := big.NewFloat(f)
+		x64, acc := floats.Log(z).Float64()
 		want := math.Log(f)
-		if z != want || acc != big.Exact {
-			t.Errorf("Log(%f) =\n got %g (%s);\nwant %g (Exact)", f, z, acc, want)
+		if x64 != want || acc != big.Exact {
+			t.Errorf("Log(%f) =\n got %g (%s);\nwant %g (Exact)", f, x64, acc, want)
 		}
 	}
 }
 
 // ---------- Benchmarks ----------
 
-func benchmarkLog(num float64, prec uint, b *testing.B) {
+func benchmarkLog(z64 float64, prec uint, b *testing.B) {
 	b.ReportAllocs()
-	x := new(big.Float).SetPrec(prec).SetFloat64(num)
+	z := big.NewFloat(z64).SetPrec(prec)
 	for n := 0; n < b.N; n++ {
-		floats.Log(x)
+		floats.Log(z)
 	}
 }
 
