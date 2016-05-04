@@ -71,16 +71,16 @@ func pi(prec uint) *big.Float {
 
 	precExt := prec + 64
 
-	half := new(big.Float).SetPrec(precExt).SetFloat64(0.5)
-	one := new(big.Float).SetPrec(precExt).SetInt64(1)
-	two := new(big.Float).SetPrec(precExt).SetInt64(2)
-	four := new(big.Float).SetPrec(precExt).SetInt64(4)
-	temp := new(big.Float)
+	half := big.NewFloat(0.5)
+	one := big.NewFloat(1)
+	two := big.NewFloat(2)
+	four := big.NewFloat(4)
 
-	a := new(big.Float).SetPrec(precExt).SetInt64(1)      // a_0 = 1
-	b := new(big.Float).Quo(one, Sqrt(two))               // b_0 = 1/sqrt(2)
-	t := new(big.Float).SetPrec(precExt).SetFloat64(0.25) // t_0 = 1/4
-	p := new(big.Float).SetPrec(precExt).SetInt64(1)      // p_0 = 1
+	temp := new(big.Float)
+	a := new(big.Float).SetPrec(precExt).SetInt64(1)         // a_0 = 1
+	b := new(big.Float).Quo(one, Sqrt(two.SetPrec(precExt))) // b_0 = 1/sqrt(2)
+	t := new(big.Float).SetPrec(precExt).SetFloat64(0.25)    // t_0 = 1/4
+	p := new(big.Float).SetPrec(precExt).SetInt64(1)         // p_0 = 1
 
 	steps := math.Log2(float64(precExt))
 

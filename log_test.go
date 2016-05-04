@@ -98,8 +98,11 @@ func TestLogSpecialValues(t *testing.T) {
 // ---------- Benchmarks ----------
 
 func benchmarkLog(z64 float64, prec uint, b *testing.B) {
-	b.ReportAllocs()
 	z := big.NewFloat(z64).SetPrec(prec)
+	_ = floats.Log(z) // fill pi cache before benchmarking
+
+	b.ReportAllocs()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		floats.Log(z)
 	}
