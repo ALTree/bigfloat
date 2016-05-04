@@ -1,7 +1,9 @@
 package floats_test
 
 import (
+	"math"
 	"math/big"
+	"math/rand"
 	"testing"
 
 	"github.com/ALTree/floats"
@@ -66,8 +68,6 @@ func TestSqrt(t *testing.T) {
 		}
 	}
 }
-
-/*
 
 func TestSqrt32(t *testing.T) {
 	for i := 0; i < 1e5; i++ {
@@ -155,8 +155,6 @@ func TestSqrtSpecialValues(t *testing.T) {
 		}
 	}
 }
-
-*/
 
 // ---------- Benchmarks ----------
 

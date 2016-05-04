@@ -126,3 +126,17 @@ func newton(f, dfInv func(z *big.Float) *big.Float, guess *big.Float, dPrec uint
 
 	return x.SetPrec(dPrec)
 }
+
+func newton2(fOverDf func(z *big.Float) *big.Float, guess *big.Float, dPrec uint) *big.Float {
+
+	prec, guard := guess.Prec(), uint(64)
+	x := new(big.Float).Copy(guess).SetPrec(prec + guard)
+
+	for prec < 2*dPrec {
+		x.Sub(x, fOverDf(x))
+		prec *= 2
+		x.SetPrec(prec + guard)
+	}
+
+	return x.SetPrec(dPrec)
+}
