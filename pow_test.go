@@ -111,4 +111,23 @@ func TestPowFloat64Big(t *testing.T) {
 	testPowFloat64(100, 4e3, t)
 }
 
+func TestPowSpecialValues(t *testing.T) {
+	for _, f := range []struct {
+		w, z float64
+	}{
+		{2, +0.0},
+		{2, -0.0},
+		{4.2, 1.0},
+		{math.Inf(+1), 2.0},
+	} {
+		w := big.NewFloat(f.w).SetPrec(53)
+		z := big.NewFloat(f.z).SetPrec(53)
+		x, acc := floats.Pow(w, z).Float64()
+		want := math.Pow(f.w, f.z)
+		if x != want || acc != big.Exact {
+			t.Errorf("Pow(%g, %g) =\n got %g (%s);\nwant %g (Exact)", f.w, f.z, x, acc, want)
+		}
+	}
+}
+
 // ---------- Benchmarks ----------

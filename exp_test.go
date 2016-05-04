@@ -85,6 +85,22 @@ func TestExpFloat64Big(t *testing.T) {
 	testExpFloat64(100, 5e3, t)
 }
 
+func TestExpSpecialValues(t *testing.T) {
+	for _, f := range []float64{
+		+0.0,
+		-0.0,
+		math.Inf(+1),
+		math.Inf(-1),
+	} {
+		x := big.NewFloat(f).SetPrec(53)
+		z, acc := floats.Exp(x).Float64()
+		want := math.Exp(f)
+		if z != want || acc != big.Exact {
+			t.Errorf("Log(%f) =\n got %g (%s);\nwant %g (Exact)", f, z, acc, want)
+		}
+	}
+}
+
 // ---------- Benchmarks ----------
 
 func benchmarkExp(num float64, prec uint, b *testing.B) {
