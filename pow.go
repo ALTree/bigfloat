@@ -18,15 +18,14 @@ func Pow(z *big.Float, w *big.Float) *big.Float {
 	// Pow(z, 1) = z
 	// Pow(+Inf, n) = +Inf
 	if w.Cmp(big.NewFloat(1)) == 0 || z.IsInf() {
-		x := new(big.Float)
-		return x.Copy(z)
+		return new(big.Float).Copy(z)
 	}
 
 	// Pow(z, -w) = 1 / Pow(z, w)
 	if w.Sign() < 0 {
 		x := new(big.Float)
 		zExt := new(big.Float).Copy(z).SetPrec(z.Prec() + 64)
-		wNeg := new(big.Float).Copy(w).Neg(w)
+		wNeg := new(big.Float).Neg(w)
 		return x.Quo(big.NewFloat(1), Pow(zExt, wNeg)).SetPrec(z.Prec())
 	}
 
@@ -36,6 +35,7 @@ func Pow(z *big.Float, w *big.Float) *big.Float {
 		return powInt(z, int(wi))
 	}
 
+	// compute w**z as exp(z log(w))
 	x := new(big.Float).SetPrec(z.Prec() + 64)
 	logZ := Log(new(big.Float).Copy(z).SetPrec(z.Prec() + 64))
 	x.Mul(w, logZ)
@@ -55,7 +55,7 @@ func powInt(z *big.Float, w int) *big.Float {
 	exp = exp * w
 
 	// result's mantissa
-	x := new(big.Float).SetPrec(z.Prec()).SetFloat64(1.0)
+	x := big.NewFloat(1).SetPrec(z.Prec())
 
 	// Classic right-to-left binary exponentiation
 	for w > 0 {
@@ -66,5 +66,5 @@ func powInt(z *big.Float, w int) *big.Float {
 		mant.Mul(mant, mant)
 	}
 
-	return new(big.Float).SetMantExp(x, exp).SetPrec(z.Prec())
+	return new(big.Float).SetMantExp(x, exp)
 }

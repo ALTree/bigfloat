@@ -17,18 +17,18 @@ func Log(z *big.Float) *big.Float {
 
 	// Log(0) = -Inf
 	if z.Sign() == 0 {
-		return big.NewFloat(math.Inf(-1))
+		return big.NewFloat(math.Inf(-1)).SetPrec(z.Prec())
 	}
 
 	prec := z.Prec() + 64 // guard digits
 
-	one := new(big.Float).SetPrec(prec).SetInt64(1)
-	two := new(big.Float).SetPrec(prec).SetInt64(2)
-	four := new(big.Float).SetPrec(prec).SetInt64(4)
+	one := big.NewFloat(1).SetPrec(prec)
+	two := big.NewFloat(2).SetPrec(prec)
+	four := big.NewFloat(4).SetPrec(prec)
 
 	// Log(1) = 0
 	if z.Cmp(one) == 0 {
-		return new(big.Float).SetPrec(z.Prec()).SetInt64(0)
+		return big.NewFloat(0).SetPrec(z.Prec())
 	}
 
 	// Log(+Inf) = +Inf
@@ -38,7 +38,7 @@ func Log(z *big.Float) *big.Float {
 
 	x := new(big.Float).SetPrec(prec)
 
-	// if 0 < x < 1 we compute log(x) as -log(1/x)
+	// if 0 < z < 1 we compute log(z) as -log(1/z)
 	var neg bool
 	if z.Cmp(one) < 0 {
 		x.Quo(one, z)

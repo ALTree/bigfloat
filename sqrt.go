@@ -19,12 +19,12 @@ func Sqrt(z *big.Float) *big.Float {
 
 	// Sqrt(±0) = ±0
 	if z.Sign() == 0 {
-		return big.NewFloat(float64(z.Sign()))
+		return big.NewFloat(0).SetPrec(z.Prec())
 	}
 
 	// Sqrt(+Inf) = +Inf
 	if z.IsInf() {
-		return big.NewFloat(math.Inf(+1))
+		return big.NewFloat(math.Inf(+1)).SetPrec(z.Prec())
 	}
 
 	prec := z.Prec() + 64 // guard digits
@@ -46,7 +46,7 @@ func Sqrt(z *big.Float) *big.Float {
 	if zfs := math.Sqrt(zf); zfs != 0 && 1/zfs != 0 {
 		x.SetFloat64(1 / zfs)
 	} else {
-		return sqrt_big(z)
+		return sqrtBig(z)
 	}
 
 	// we need at least log_2(prec) iterations
@@ -70,20 +70,18 @@ func Sqrt(z *big.Float) *big.Float {
 	return x.SetPrec(z.Prec())
 }
 
-func sqrt_big(z *big.Float) *big.Float {
+func sqrtBig(z *big.Float) *big.Float {
 
 	prec := z.Prec() + 64
 
-	one := new(big.Float).SetPrec(prec).SetInt64(1)
-	half := new(big.Float).SetPrec(prec).SetFloat64(0.5)
+	one := big.NewFloat(1).SetPrec(prec)
+	half := big.NewFloat(0.5)
 
 	x := new(big.Float).SetPrec(prec).SetMantExp(one, z.MantExp(nil)/2)
-
 	t := new(big.Float)
 
 	// Classic Newton iteration:
 	//     x_{n+1} = 1/2 * ( x_n + (S / x_n) )
-
 	steps := int(math.Log2(float64(prec))) + 1
 	for i := 0; i < steps; i++ {
 		t.Quo(z, x)    // t = S / x_n
