@@ -109,3 +109,20 @@ func pi(prec uint) *big.Float {
 
 	return res
 }
+
+func newton(f, dfInv func(z *big.Float) *big.Float, guess *big.Float, dPrec uint) *big.Float {
+
+	prec, guard := guess.Prec(), uint(64)
+	t := new(big.Float)
+	x := new(big.Float).Copy(guess).SetPrec(prec + guard)
+
+	for prec < 2*dPrec {
+		t.Mul(f(x), dfInv(x))
+		x.Sub(x, t)
+		prec *= 2
+		x.SetPrec(prec + guard)
+		t.SetPrec(prec + guard)
+	}
+
+	return x.SetPrec(dPrec)
+}

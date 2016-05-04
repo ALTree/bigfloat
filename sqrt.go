@@ -27,6 +27,56 @@ func Sqrt(z *big.Float) *big.Float {
 		return big.NewFloat(math.Inf(+1))
 	}
 
+	// setup newton
+
+	// f(t) = t² - z
+	f := func(t *big.Float) *big.Float {
+		x := new(big.Float)
+		x.Mul(t, t)
+		return x.Sub(x, z)
+	}
+
+	// 1/f'(t) = 1/(2t)
+	dfInv := func(t *big.Float) *big.Float {
+		x := new(big.Float).SetPrec(t.Prec())
+		one, two := big.NewFloat(1), big.NewFloat(2)
+		return x.Quo(one, x.Mul(two, t))
+	}
+
+	// initial guess
+	zf, _ := z.Float64()
+	guess := new(big.Float)
+	if zfs := math.Sqrt(zf); zfs != 0 && zfs != math.Inf(+1) {
+		guess.SetFloat64(zfs)
+	} else {
+		// how many correct digits the "halven exponent"
+		// trick gives us? Guess 2...
+		one := big.NewFloat(1).SetPrec(2)
+		guess.SetMantExp(one, z.MantExp(nil)/2)
+	}
+
+	// call newton
+	x := newton(f, dfInv, guess, z.Prec())
+	return x
+}
+
+func Sqrt2(z *big.Float) *big.Float {
+
+	// panic on negative z
+	if z.Sign() == -1 {
+		panic("Sqrt: argument is negative")
+	}
+
+	// Sqrt(±0) = ±0
+	if z.Sign() == 0 {
+		return big.NewFloat(float64(z.Sign()))
+	}
+
+	// Sqrt(+Inf) = +Inf
+	if z.IsInf() {
+		return big.NewFloat(math.Inf(+1))
+	}
+
 	prec := z.Prec() + 64 // guard digits
 
 	half := new(big.Float).SetFloat64(0.5)
@@ -46,7 +96,7 @@ func Sqrt(z *big.Float) *big.Float {
 	if zfs := math.Sqrt(zf); zfs != 0 && 1/zfs != 0 {
 		x.SetFloat64(1 / zfs)
 	} else {
-		return sqrt_big(z)
+		return sqrtBig(z)
 	}
 
 	// we need at least log_2(prec) iterations
@@ -70,7 +120,7 @@ func Sqrt(z *big.Float) *big.Float {
 	return x.SetPrec(z.Prec())
 }
 
-func sqrt_big(z *big.Float) *big.Float {
+func sqrtBig(z *big.Float) *big.Float {
 
 	prec := z.Prec() + 64
 
