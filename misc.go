@@ -109,3 +109,44 @@ func pi(prec uint) *big.Float {
 
 	return res
 }
+
+// returns an approximate (to precision dPrec) solution to
+//    f(t) = 0
+// using the Newton Method.
+// dfInv needs to be a fuction returning 1/f'(t).
+// guess is the initial guess.
+func newton(f, dfInv func(z *big.Float) *big.Float, guess *big.Float, dPrec uint) *big.Float {
+
+	prec, guard := guess.Prec(), uint(64)
+	t := new(big.Float)
+	x := new(big.Float).Copy(guess).SetPrec(prec + guard)
+
+	for prec < 2*dPrec {
+		t.Mul(f(x), dfInv(x))
+		x.Sub(x, t)
+		prec *= 2
+		x.SetPrec(prec + guard)
+		t.SetPrec(prec + guard)
+	}
+
+	return x.SetPrec(dPrec)
+}
+
+// returns an approximate (to precision dPrec) solution to
+//    f(t) = 0
+// using the Newton Method.
+// fOverDf needs to be a fuction returning f(t)/f'(t).
+// guess is the initial guess.
+func newton2(fOverDf func(z *big.Float) *big.Float, guess *big.Float, dPrec uint) *big.Float {
+
+	prec, guard := guess.Prec(), uint(64)
+	x := new(big.Float).Copy(guess).SetPrec(prec + guard)
+
+	for prec < 2*dPrec {
+		x.Sub(x, fOverDf(x))
+		prec *= 2
+		x.SetPrec(prec + guard)
+	}
+
+	return x.SetPrec(dPrec)
+}
