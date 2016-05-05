@@ -65,25 +65,19 @@ func Sqrt(z *big.Float) *big.Float {
 // compute √z using newton to solve
 // t² - z = 0 for t
 func sqrtDirect(z *big.Float) *big.Float {
-	// f(t) = t² - z
+	// f(t)/f'(t) = 0.5(t² - z)/t
 	f := func(t *big.Float) *big.Float {
-		x := new(big.Float).Mul(t, t)
-		return x.Sub(x, z)
-	}
-
-	// 1/f'(t) = 1/(2t)
-	dfInv := func(t *big.Float) *big.Float {
-		one := big.NewFloat(1)
-		two := big.NewFloat(2)
-		x := new(big.Float).Mul(two, t)
-		return x.Quo(one, x)
+		x := new(big.Float).Mul(t, t) // x = t²
+		x.Sub(x, z)                   // x = t² - z
+		x.Mul(big.NewFloat(0.5), x)   // x = 0.5(t² - z)
+		return x.Quo(x, t)            // return x = 0.5(t² - z)/t
 	}
 
 	// initial guess
 	zf, _ := z.Float64()
 	guess := big.NewFloat(math.Sqrt(zf))
 
-	return newton(f, dfInv, guess, z.Prec())
+	return newton(f, guess, z.Prec())
 }
 
 // compute √z using newton to solve
@@ -106,6 +100,6 @@ func sqrtInverse(z *big.Float) *big.Float {
 	// There's another operation after newton,
 	// so we need to force it to return at least
 	// a few guard digits. Use 32.
-	x := newton2(f, guess, z.Prec()+32)
+	x := newton(f, guess, z.Prec()+32)
 	return x.Mul(z, x).SetPrec(z.Prec())
 }

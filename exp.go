@@ -48,7 +48,7 @@ func Exp(z *big.Float) *big.Float {
 		return x.Mul(x, t)
 	}
 
-	x := newton2(f, guess, z.Prec())
+	x := newton(f, guess, z.Prec())
 
 	return x
 }
