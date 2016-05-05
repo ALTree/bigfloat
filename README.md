@@ -24,18 +24,31 @@ import (
 	"github.com/ALTree/floats"
 )
 
+// In this example, we'll compute the value of the
+// trascendental number 2 ** √2, also known as
+// the Gelfond–Schneider constant, to 1000 bits.
 func main() {
-	const prec = 200 // 200 binary digits
-	two := new(big.Float).SetPrec(prec).SetInt64(2)
+	// Work with 1000 binary digits of precision.
+	const prec = 1000
 
-	z := floats.Sqrt(two) // z.Prec is automatically set to 200
+	two := big.NewFloat(2).SetPrec(prec)
 
-	fmt.Printf("sqrt(2) = %.50f...\n", z) // print the first 50 decimal digits
+	// Compute √2.
+	// Sqrt uses the argument's precision.
+	sqrtTwo := floats.Sqrt(two)
+
+	// Compute 2 ** √2
+	// Pow uses the first argument's precision.
+	gsc := floats.Pow(two, sqrtTwo)
+
+	// Print gsc, truncated to 60 decimal digits.
+	fmt.Printf("gsc = %.60f...\n", gsc)
 }
 ```
+
 outputs
 ```
-sqrt(2) = 1.41421356237309504880168872420969807856967187537694...
+gsc = 2.665144142690225188650297249873139848274211313714659492835980...
 ```
 
 #### Documentation
