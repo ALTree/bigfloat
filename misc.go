@@ -8,65 +8,30 @@ import (
 // agm returns the arithmetic-geometric mean of a and b, to
 // max(a.Prec, b.Prec) bits of precision. a and b must have
 // the same precision.
-func agm2(a, b *big.Float) *big.Float {
-
-	if a.Prec() != b.Prec() {
-		panic("agm: different precisions")
-	}
-
-	var prec uint = a.Prec() + 64
-
-	half := new(big.Float).SetPrec(prec).SetFloat64(0.5)
-
-	a2 := new(big.Float)
-	b2 := new(big.Float)
-	a2.Copy(a).SetPrec(prec)
-	b2.Copy(b).SetPrec(prec)
-
-	checkA := new(big.Float).Copy(a2).SetPrec(prec - 64)
-	checkB := new(big.Float).Copy(b2).SetPrec(prec - 64)
-	t1 := new(big.Float)
-
-	// iterate until a2 == b2 (with a2 and b2 reduced to the
-	// desired precision, i.e. ignoring the guard digits)
-	for checkA.Cmp(checkB) != 0 {
-		t1.Copy(a2)
-		a2.Add(a2, b2).Mul(a2, half)
-		b2 = Sqrt(b2.Mul(t1, b2))
-
-		checkA.Copy(a2).SetPrec(prec - 64)
-		checkB.Copy(b2).SetPrec(prec - 64)
-	}
-
-	return checkA
-}
-
 func agm(a, b *big.Float) *big.Float {
 
 	if a.Prec() != b.Prec() {
 		panic("agm: different precisions")
 	}
 
+	prec := a.Prec()
+
 	// do not overwrite a and b
-	a2 := new(big.Float).Copy(a)
-	b2 := new(big.Float).Copy(b)
+	a2 := new(big.Float).Copy(a).SetPrec(prec + 64)
+	b2 := new(big.Float).Copy(b).SetPrec(prec + 64)
 
 	if a2.Cmp(b2) == -1 {
 		a2, b2 = b2, a2
 	}
+	// a >= b
 
-	prec := a.Prec()
-
-	// lim = 2**(-prec)
+	// set lim to 2**(-prec)
 	lim := new(big.Float)
 	lim.SetMantExp(big.NewFloat(1).SetPrec(prec+64), -int(prec+1))
+
+	half := big.NewFloat(0.5)
 	t := new(big.Float)
 
-	a2.SetPrec(prec + 64)
-	b2.SetPrec(prec + 64)
-	half := big.NewFloat(0.5)
-
-	// requires a > b during the iterations
 	for t.Sub(a2, b2).Cmp(lim) != -1 {
 		t.Copy(a2)
 		a2.Add(a2, b2).Mul(a2, half)
