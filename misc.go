@@ -1,13 +1,9 @@
 package floats
 
-import (
-	"math"
-	"math/big"
-)
+import "math/big"
 
-// agm returns the arithmetic-geometric mean of a and b, to
-// max(a.Prec, b.Prec) bits of precision. a and b must have
-// the same precision.
+// agm returns the arithmetic-geometric mean of a and b.
+// a and b must have the same precision.
 func agm(a, b *big.Float) *big.Float {
 
 	if a.Prec() != b.Prec() {
@@ -23,7 +19,7 @@ func agm(a, b *big.Float) *big.Float {
 	if a2.Cmp(b2) == -1 {
 		a2, b2 = b2, a2
 	}
-	// a >= b
+	// a2 >= b2
 
 	// set lim to 2**(-prec)
 	lim := new(big.Float)
@@ -69,45 +65,46 @@ func pi(prec uint) *big.Float {
 		return new(big.Float).Copy(piCache).SetPrec(prec)
 	}
 
-	precExt := prec + 64
+	// Following R. P. Brent, Multiple-precision zero-finding
+	// methods and the complexity of elementary function evaluation,
+	// in Analytic Computational Complexity, Academic Press,
+	// New York, 1975, Section 8.
 
 	half := big.NewFloat(0.5)
-	one := big.NewFloat(1)
-	two := big.NewFloat(2)
-	four := big.NewFloat(4)
+	two := big.NewFloat(2).SetPrec(prec + 64)
 
-	temp := new(big.Float)
-	a := new(big.Float).SetPrec(precExt).SetInt64(1)         // a_0 = 1
-	b := new(big.Float).Quo(one, Sqrt(two.SetPrec(precExt))) // b_0 = 1/sqrt(2)
-	t := new(big.Float).SetPrec(precExt).SetFloat64(0.25)    // t_0 = 1/4
-	p := new(big.Float).SetPrec(precExt).SetInt64(1)         // p_0 = 1
+	// initialization
+	a := big.NewFloat(1).SetPrec(prec + 64)    // a = 1
+	b := new(big.Float).Mul(Sqrt(two), half)   // b = 1/√2
+	t := big.NewFloat(0.25).SetPrec(prec + 64) // t = 1/4
+	x := big.NewFloat(1).SetPrec(prec + 64)    // x = 1
 
-	steps := math.Log2(float64(precExt))
+	// limit is 2**(-prec)
+	lim := new(big.Float)
+	lim.SetMantExp(big.NewFloat(1).SetPrec(prec+64), -int(prec+1))
 
-	a2 := new(big.Float)
-	for i := 0; i < int(steps); i++ {
-		a2.Add(a, b).Mul(a2, half) // a_{n+1} = (a_{n} + b_{n}) / 2
-		b = Sqrt(temp.Mul(a, b))   // b_{n+1} = sqrt(a_{n} * b_{n})
+	// temp variables
+	y := new(big.Float)
+	for y.Sub(a, b).Cmp(lim) != -1 { // assume a > b
+		y.Copy(a)
+		a.Add(a, b).Mul(a, half) // a = (a+b)/2
+		b = Sqrt(b.Mul(b, y))    // b = √(ab)
 
-		temp.Sub(a, a2).Mul(temp, temp) // temp = (a_{n} - a_{n+1})²
-		t.Sub(t, temp.Mul(p, temp))     // t_{n+1} = t_{n} - p_{n} * temp
-
-		p.Mul(two, p) // p_{n+1} = 2 * p_{n}
-
-		a.Copy(a2)
+		y.Sub(a, y)           // y = a - y
+		y.Mul(y, y).Mul(y, x) // y = x(a-y)²
+		t.Sub(t, y)           // t = t - x(a-y)²
+		x.Mul(x, two)         // x = 2x
 	}
 
-	temp.Add(a, b)
-	temp.Mul(temp, temp)
-	res := new(big.Float).Quo(temp, t.Mul(four, t)) // pi = (a_{n+1} + b_{n+1})² / (4t_{n+1})
-	res.SetPrec(prec)
+	a.Mul(a, a).Quo(a, t) // π = a² / t
+	a.SetPrec(prec)
 
 	if enablePiCache {
-		piCache.Copy(res)
+		piCache.Copy(a)
 		piCachePrec = prec
 	}
 
-	return res
+	return a
 }
 
 // returns an approximate (to precision dPrec) solution to
