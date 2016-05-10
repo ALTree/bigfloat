@@ -8,7 +8,7 @@ import (
 // agm returns the arithmetic-geometric mean of a and b, to
 // max(a.Prec, b.Prec) bits of precision. a and b must have
 // the same precision.
-func agm(a, b *big.Float) *big.Float {
+func agm2(a, b *big.Float) *big.Float {
 
 	if a.Prec() != b.Prec() {
 		panic("agm: different precisions")
@@ -39,6 +39,41 @@ func agm(a, b *big.Float) *big.Float {
 	}
 
 	return checkA
+}
+
+func agm(a, b *big.Float) *big.Float {
+
+	if a.Prec() != b.Prec() {
+		panic("agm: different precisions")
+	}
+
+	// do not overwrite a and b
+	a2 := new(big.Float).Copy(a)
+	b2 := new(big.Float).Copy(b)
+
+	if a2.Cmp(b2) == -1 {
+		a2, b2 = b2, a2
+	}
+
+	prec := a.Prec()
+
+	// lim = 2**(-prec)
+	lim := new(big.Float)
+	lim.SetMantExp(big.NewFloat(1).SetPrec(prec+64), -int(prec+1))
+	t := new(big.Float)
+
+	a2.SetPrec(prec + 64)
+	b2.SetPrec(prec + 64)
+	half := big.NewFloat(0.5)
+
+	// requires a > b during the iterations
+	for t.Sub(a2, b2).Cmp(lim) != -1 {
+		t.Copy(a2)
+		a2.Add(a2, b2).Mul(a2, half)
+		b2 = Sqrt(b2.Mul(b2, t))
+	}
+
+	return a2.SetPrec(prec)
 }
 
 var piCache *big.Float
