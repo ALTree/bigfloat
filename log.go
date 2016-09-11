@@ -5,9 +5,10 @@ import (
 	"math/big"
 )
 
-// Log returns a big.Float representation of the natural logarithm of z. Precision is
-// the same as the one of the argument. The function panics if z is negative, returns -Inf
-// when z = 0, and +Inf when z = +Inf
+// Log returns a big.Float representation of the natural logarithm of
+// z. Precision is the same as the one of the argument. The function
+// panics if z is negative, returns -Inf when z = 0, and +Inf when z =
+// +Inf
 func Log(z *big.Float) *big.Float {
 
 	// panic on negative z
@@ -47,12 +48,14 @@ func Log(z *big.Float) *big.Float {
 		x.Set(z)
 	}
 
-	// We scale up x until x >= 2**(prec/2), and then we'll be
-	// allowed to use the AGM formula for Log(x).
-	// Double x until the condition is met, and keep track of
-	// the number of doubling we did (needed to scale back later).
+	// We scale up x until x >= 2**(prec/2), and then we'll be allowed
+	// to use the AGM formula for Log(x).
+	//
+	// Double x until the condition is met, and keep track of the
+	// number of doubling we did (needed to scale back later).
 
-	lim := powInt(two, int(prec/2))
+	lim := new(big.Float)
+	lim.SetMantExp(two, int(prec/2))
 
 	k := 0
 	for x.Cmp(lim) < 0 {
@@ -65,19 +68,18 @@ func Log(z *big.Float) *big.Float {
 	// if
 	//     x >= 2**(prec/2),
 	// where prec is the desired precision (in bits)
-
 	pi := pi(prec)
 	agm := agm(one, x.Quo(four, x)) // agm = AGM(1, 4/x)
 
 	x.Quo(pi, x.Mul(two, agm)) // reuse x, we don't need it
 
-	// change sign if the z was < 1
 	if neg {
 		x.Neg(x)
 	}
 
-	// scale the result back dividing by 2**k
-	x.Quo(x, powInt(two, k))
+	// scale the result back multiplying by 2**-k
+	// reuse lim to reduce allocations.
+	x.Mul(x, lim.SetMantExp(one, -k))
 
 	return x.SetPrec(z.Prec())
 }
