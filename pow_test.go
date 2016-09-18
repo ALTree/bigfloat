@@ -1,4 +1,4 @@
-package floats_test
+package bigfloat_test
 
 import (
 	"math"
@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ALTree/floats"
+	"github.com/ALTree/bigfloat"
 )
 
 func TestPow(t *testing.T) {
@@ -29,7 +29,7 @@ func TestPow(t *testing.T) {
 			w := new(big.Float).SetPrec(prec)
 			w.Parse(test.w, 10)
 
-			x := floats.Pow(z, w)
+			x := bigfloat.Pow(z, w)
 
 			if x.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Pow(%v, %v) =\ngot  %g;\nwant %g", prec, test.z, test.w, x, want)
@@ -62,7 +62,7 @@ func TestPowIntegers(t *testing.T) {
 			w := new(big.Float).SetPrec(prec)
 			w.Parse(test.w, 10)
 
-			x := floats.Pow(z, w)
+			x := bigfloat.Pow(z, w)
 
 			if x.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Pow(%v, %v) =\ngot  %g;\nwant %g", prec, test.z, test.w, x, want)
@@ -79,7 +79,7 @@ func testPowFloat64(scale float64, nTests int, t *testing.T) {
 		z := big.NewFloat(r1).SetPrec(53)
 		w := big.NewFloat(r2).SetPrec(53)
 
-		x64, acc := floats.Pow(z, w).Float64()
+		x64, acc := bigfloat.Pow(z, w).Float64()
 
 		want := math.Pow(r1, r2)
 
@@ -122,7 +122,7 @@ func TestPowSpecialValues(t *testing.T) {
 	} {
 		z := big.NewFloat(f.z).SetPrec(53)
 		w := big.NewFloat(f.w).SetPrec(53)
-		x64, acc := floats.Pow(z, w).Float64()
+		x64, acc := bigfloat.Pow(z, w).Float64()
 		want := math.Pow(f.z, f.w)
 		if x64 != want || acc != big.Exact {
 			t.Errorf("Pow(%g, %g) =\n got %g (%s);\nwant %g (Exact)", f.z, f.w, x64, acc, want)
@@ -135,12 +135,12 @@ func TestPowSpecialValues(t *testing.T) {
 func benchmarkPow(z64, w64 float64, prec uint, b *testing.B) {
 	z := big.NewFloat(z64).SetPrec(prec)
 	w := big.NewFloat(w64).SetPrec(prec)
-	_ = floats.Exp(z) // fill pi cache before benchmarking
+	_ = bigfloat.Exp(z) // fill pi cache before benchmarking
 
 	b.ReportAllocs()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		floats.Pow(z, w)
+		bigfloat.Pow(z, w)
 	}
 }
 

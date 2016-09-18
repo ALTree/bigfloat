@@ -1,16 +1,16 @@
 ### Floats 
 
-Package floats provides the implementation of a few additional operations (square root, exponentiation, natural logarithm, exponential function) for the standard library `big.Float` type.
+Package bigfloat provides the implementation of a few additional operations (square root, exponentiation, natural logarithm, exponential function) for the standard library `big.Float` type.
 
-[![GoDoc](https://godoc.org/github.com/ALTree/floats?status.png)](https://godoc.org/github.com/ALTree/floats)
+[![GoDoc](https://godoc.org/github.com/ALTree/bigfloat?status.png)](https://godoc.org/github.com/ALTree/bigfloat)
 
 #### Install
 
 ```
-go get github.com/ALTree/floats
+go get github.com/ALTree/bigfloat
 ```
 
-Please note that `floats` requires Go >= 1.5 (since the `big.Float` type is not available in previous versions). 
+Please note that `bigfloat` requires Go >= 1.5 (since the `big.Float` type is not available in previous versions). 
 
 #### Example
 
@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ALTree/floats"
+	"github.com/ALTree/bigfloat"
 )
 
 // In this example, we'll compute the value of the
@@ -35,11 +35,11 @@ func main() {
 
 	// Compute √2.
 	// Sqrt uses the argument's precision.
-	sqrtTwo := floats.Sqrt(two)
+	sqrtTwo := bigfloat.Sqrt(two)
 
 	// Compute 2 ** √2
 	// Pow uses the first argument's precision.
-	gsc := floats.Pow(two, sqrtTwo)
+	gsc := bigfloat.Pow(two, sqrtTwo)
 
 	// Print gsc, truncated to 60 decimal digits.
 	fmt.Printf("gsc = %.60f...\n", gsc)
@@ -53,4 +53,4 @@ gsc = 2.665144142690225188650297249873139848274211313714659492835980...
 
 #### Documentation
 
-See https://godoc.org/github.com/ALTree/floats
+See https://godoc.org/github.com/ALTree/bigfloat

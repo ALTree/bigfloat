@@ -1,4 +1,4 @@
-package floats_test
+package bigfloat_test
 
 import (
 	"math"
@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ALTree/floats"
+	"github.com/ALTree/bigfloat"
 )
 
 func TestExp(t *testing.T) {
@@ -39,7 +39,7 @@ func TestExp(t *testing.T) {
 			z := new(big.Float).SetPrec(prec)
 			z.Parse(test.z, 10)
 
-			x := floats.Exp(z)
+			x := bigfloat.Exp(z)
 
 			if x.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Exp(%v) =\ngot  %g;\nwant %g", prec, test.z, x, want)
@@ -53,7 +53,7 @@ func testExpFloat64(scale float64, nTests int, t *testing.T) {
 		r := rand.Float64() * scale
 
 		z := big.NewFloat(r)
-		z64, acc := floats.Exp(z).Float64()
+		z64, acc := bigfloat.Exp(z).Float64()
 
 		want := math.Exp(r)
 
@@ -93,7 +93,7 @@ func TestExpSpecialValues(t *testing.T) {
 		math.Inf(-1),
 	} {
 		z := big.NewFloat(f)
-		x64, acc := floats.Exp(z).Float64()
+		x64, acc := bigfloat.Exp(z).Float64()
 		want := math.Exp(f)
 		if x64 != want || acc != big.Exact {
 			t.Errorf("Log(%f) =\n got %g (%s);\nwant %g (Exact)", f, x64, acc, want)
@@ -105,12 +105,12 @@ func TestExpSpecialValues(t *testing.T) {
 
 func benchmarkExp(z64 float64, prec uint, b *testing.B) {
 	z := big.NewFloat(z64).SetPrec(prec)
-	_ = floats.Exp(z) // fill pi cache before benchmarking
+	_ = bigfloat.Exp(z) // fill pi cache before benchmarking
 
 	b.ReportAllocs()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		floats.Exp(z)
+		bigfloat.Exp(z)
 	}
 }
 

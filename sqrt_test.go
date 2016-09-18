@@ -1,4 +1,4 @@
-package floats_test
+package bigfloat_test
 
 import (
 	"math"
@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ALTree/floats"
+	"github.com/ALTree/bigfloat"
 )
 
 const maxPrec uint = 1100
@@ -60,7 +60,7 @@ func TestSqrt(t *testing.T) {
 			z := new(big.Float).SetPrec(prec)
 			z.Parse(test.z, 10)
 
-			x := floats.Sqrt(z)
+			x := bigfloat.Sqrt(z)
 
 			if x.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Sqrt(%v) =\ngot  %g;\nwant %g", prec, test.z, x, want)
@@ -74,7 +74,7 @@ func testSqrtFloat64(scale float64, nTests int, t *testing.T) {
 		r := rand.Float64() * scale
 
 		z := big.NewFloat(r)
-		x64, acc := floats.Sqrt(z).Float64()
+		x64, acc := bigfloat.Sqrt(z).Float64()
 
 		want := math.Sqrt(r)
 
@@ -106,7 +106,7 @@ func TestSqrtSpecialValues(t *testing.T) {
 		math.Inf(+1),
 	} {
 		z := big.NewFloat(f)
-		x64, acc := floats.Sqrt(z).Float64()
+		x64, acc := bigfloat.Sqrt(z).Float64()
 		want := math.Sqrt(f)
 		if x64 != want || acc != big.Exact {
 			t.Errorf("Sqrt(%g) =\n got %g (%s);\nwant %g (Exact)", z, x64, acc, want)
@@ -120,7 +120,7 @@ func benchmarkSqrt(z64 float64, prec uint, b *testing.B) {
 	b.ReportAllocs()
 	z := big.NewFloat(z64).SetPrec(prec)
 	for n := 0; n < b.N; n++ {
-		floats.Sqrt(z)
+		bigfloat.Sqrt(z)
 	}
 }
 
