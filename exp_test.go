@@ -1,6 +1,7 @@
 package bigfloat_test
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
@@ -103,19 +104,17 @@ func TestExpSpecialValues(t *testing.T) {
 
 // ---------- Benchmarks ----------
 
-func benchmarkExp(z64 float64, prec uint, b *testing.B) {
-	z := big.NewFloat(z64).SetPrec(prec)
+func BenchmarkExp(b *testing.B) {
+	z := big.NewFloat(2).SetPrec(1e5)
 	_ = bigfloat.Exp(z) // fill pi cache before benchmarking
 
-	b.ReportAllocs()
-	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
-		bigfloat.Exp(z)
+	for _, prec := range []uint{1e2, 1e3, 1e4, 1e5} {
+		z = big.NewFloat(2).SetPrec(prec)
+		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				bigfloat.Exp(z)
+			}
+		})
 	}
 }
-
-func BenchmarkExp2Prec53(b *testing.B)     { benchmarkExp(2, 53, b) }
-func BenchmarkExp2Prec100(b *testing.B)    { benchmarkExp(2, 1e2, b) }
-func BenchmarkExp2Prec1000(b *testing.B)   { benchmarkExp(2, 1e3, b) }
-func BenchmarkExp2Prec10000(b *testing.B)  { benchmarkExp(2, 1e4, b) }
-func BenchmarkExp2Prec100000(b *testing.B) { benchmarkExp(2, 1e5, b) }

@@ -1,6 +1,7 @@
 package bigfloat_test
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
@@ -116,16 +117,14 @@ func TestSqrtSpecialValues(t *testing.T) {
 
 // ---------- Benchmarks ----------
 
-func benchmarkSqrt(z64 float64, prec uint, b *testing.B) {
-	b.ReportAllocs()
-	z := big.NewFloat(z64).SetPrec(prec)
-	for n := 0; n < b.N; n++ {
-		bigfloat.Sqrt(z)
+func BenchmarkSqrt(b *testing.B) {
+	for _, prec := range []uint{1e2, 1e3, 1e4, 1e5} {
+		z := big.NewFloat(2).SetPrec(prec)
+		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				bigfloat.Sqrt(z)
+			}
+		})
 	}
 }
-
-func BenchmarkSqrt2Prec53(b *testing.B)     { benchmarkSqrt(2, 53, b) }
-func BenchmarkSqrt2Prec100(b *testing.B)    { benchmarkSqrt(2, 1e2, b) }
-func BenchmarkSqrt2Prec1000(b *testing.B)   { benchmarkSqrt(2, 1e3, b) }
-func BenchmarkSqrt2Prec10000(b *testing.B)  { benchmarkSqrt(2, 1e4, b) }
-func BenchmarkSqrt2Prec100000(b *testing.B) { benchmarkSqrt(2, 1e5, b) }

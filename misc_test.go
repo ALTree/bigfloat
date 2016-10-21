@@ -1,6 +1,7 @@
 package bigfloat
 
 import (
+	"fmt"
 	"math/big"
 	"testing"
 )
@@ -57,32 +58,27 @@ func TestPi(t *testing.T) {
 
 // ---------- Benchmarks ----------
 
-func benchmarkAgm(xf, yf float64, prec uint, b *testing.B) {
-	b.ReportAllocs()
-	x := new(big.Float).SetPrec(prec).SetFloat64(xf)
-	y := new(big.Float).SetPrec(prec).SetFloat64(yf)
-	for n := 0; n < b.N; n++ {
-		agm(x, y)
+func BenchmarkAgm(b *testing.B) {
+	for _, prec := range []uint{1e2, 1e3, 1e4, 1e5} {
+		x := new(big.Float).SetPrec(prec).SetFloat64(1)
+		y := new(big.Float).SetPrec(prec).SetFloat64(0.125)
+		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				agm(x, y)
+			}
+		})
 	}
 }
 
-func BenchmarkAgmPrec53(b *testing.B)     { benchmarkAgm(1, 0.125, 53, b) }
-func BenchmarkAgmPrec100(b *testing.B)    { benchmarkAgm(1, 0.125, 1e2, b) }
-func BenchmarkAgmPrec1000(b *testing.B)   { benchmarkAgm(1, 0.125, 1e3, b) }
-func BenchmarkAgmPrec10000(b *testing.B)  { benchmarkAgm(1, 0.125, 1e4, b) }
-func BenchmarkAgmPrec100000(b *testing.B) { benchmarkAgm(1, 0.125, 1e5, b) }
-
-func benchmarkPi(prec uint, b *testing.B) {
+func BenchmarkPi(b *testing.B) {
 	enablePiCache = false
-	b.ReportAllocs()
-	for n := 0; n < b.N; n++ {
-		pi(prec)
+	for _, prec := range []uint{1e2, 1e3, 1e4, 1e5} {
+		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				pi(prec)
+			}
+		})
 	}
-	enablePiCache = true
 }
-
-func BenchmarkPiPrec53(b *testing.B)     { benchmarkPi(53, b) }
-func BenchmarkPiPrec100(b *testing.B)    { benchmarkPi(1e2, b) }
-func BenchmarkPiPrec1000(b *testing.B)   { benchmarkPi(1e3, b) }
-func BenchmarkPiPrec10000(b *testing.B)  { benchmarkPi(1e4, b) }
-func BenchmarkPiPrec100000(b *testing.B) { benchmarkPi(1e5, b) }

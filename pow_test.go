@@ -1,6 +1,7 @@
 package bigfloat_test
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
@@ -132,26 +133,36 @@ func TestPowSpecialValues(t *testing.T) {
 
 // ---------- Benchmarks ----------
 
-func benchmarkPow(z64, w64 float64, prec uint, b *testing.B) {
-	z := big.NewFloat(z64).SetPrec(prec)
-	w := big.NewFloat(w64).SetPrec(prec)
-	_ = bigfloat.Exp(z) // fill pi cache before benchmarking
+func BenchmarkPowInt(b *testing.B) {
+	z := big.NewFloat(2).SetPrec(1e5)
+	w := big.NewFloat(50).SetPrec(1e5)
+	_ = bigfloat.Pow(z, w) // fill pi cache before benchmarking
 
-	b.ReportAllocs()
-	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
-		bigfloat.Pow(z, w)
+	for _, prec := range []uint{1e2, 1e3, 1e4, 1e5} {
+		z = big.NewFloat(2).SetPrec(prec)
+		w = big.NewFloat(50).SetPrec(prec)
+		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				bigfloat.Pow(z, w)
+			}
+		})
 	}
 }
 
-func BenchmarkPowIntPrec53(b *testing.B)     { benchmarkPow(2, 50, 53, b) }
-func BenchmarkPowIntPrec100(b *testing.B)    { benchmarkPow(2, 50, 1e2, b) }
-func BenchmarkPowIntPrec1000(b *testing.B)   { benchmarkPow(2, 50, 1e3, b) }
-func BenchmarkPowIntPrec10000(b *testing.B)  { benchmarkPow(2, 50, 1e4, b) }
-func BenchmarkPowIntPrec100000(b *testing.B) { benchmarkPow(2, 50, 1e5, b) }
+func BenchmarkPow(b *testing.B) {
+	z := big.NewFloat(2).SetPrec(1e5)
+	w := big.NewFloat(1.5).SetPrec(1e5)
+	_ = bigfloat.Pow(z, w) // fill pi cache before benchmarking
 
-func BenchmarkPowPrec53(b *testing.B)     { benchmarkPow(1.5, 1.5, 53, b) }
-func BenchmarkPowPrec100(b *testing.B)    { benchmarkPow(1.5, 1.5, 1e2, b) }
-func BenchmarkPowPrec1000(b *testing.B)   { benchmarkPow(1.5, 1.5, 1e3, b) }
-func BenchmarkPowPrec10000(b *testing.B)  { benchmarkPow(1.5, 1.5, 1e4, b) }
-func BenchmarkPowPrec100000(b *testing.B) { benchmarkPow(1.5, 1.5, 1e5, b) }
+	for _, prec := range []uint{1e2, 1e3, 1e4, 1e5} {
+		z = big.NewFloat(2).SetPrec(prec)
+		w = big.NewFloat(1.5).SetPrec(prec)
+		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				bigfloat.Pow(z, w)
+			}
+		})
+	}
+}
