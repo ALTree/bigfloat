@@ -29,8 +29,9 @@ func Pow(z *big.Float, w *big.Float) *big.Float {
 		return x.Quo(big.NewFloat(1), Pow(zExt, wNeg)).SetPrec(z.Prec())
 	}
 
-	// w integer fast path
-	if w.IsInt() {
+	// w integer fast path (disabled because introduces rounding
+	// errors)
+	if false && w.IsInt() {
 		wi, _ := w.Int64()
 		return powInt(z, int(wi))
 	}
