@@ -113,6 +113,17 @@ func TestSqrtSpecialValues(t *testing.T) {
 	}
 }
 
+func TestSqrtNegativeParameterPanic(t *testing.T) {
+	defer func() {
+		if err := recover(); err == nil {
+			t.Errorf("No panic for Sqrt(-1)")
+		} else {
+			_ = err.(ErrNaN).Error()
+		}
+	}()
+	_ = Sqrt(big.NewFloat(-1))
+}
+
 // ---------- Benchmarks ----------
 
 func BenchmarkSqrt(b *testing.B) {

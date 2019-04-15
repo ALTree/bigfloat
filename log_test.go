@@ -94,6 +94,17 @@ func TestLogSpecialValues(t *testing.T) {
 	}
 }
 
+func TestLogNegativeParameterPanic(t *testing.T) {
+	defer func() {
+		if err := recover(); err == nil {
+			t.Errorf("No panic for Log(-1)")
+		} else {
+			_ = err.(ErrNaN).Error()
+		}
+	}()
+	_ = Log(big.NewFloat(-1))
+}
+
 // ---------- Benchmarks ----------
 
 func BenchmarkLog(b *testing.B) {

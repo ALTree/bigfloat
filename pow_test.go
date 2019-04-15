@@ -142,6 +142,17 @@ func TestPowSpecialValues(t *testing.T) {
 	}
 }
 
+func TestPowNegativeBaseWithNonIntegerExponent(t *testing.T) {
+	defer func() {
+		if err := recover(); err == nil {
+			t.Errorf("No panic for Pow(-1, 0.5)")
+		} else {
+			_ = err.(ErrNaN).Error()
+		}
+	}()
+	_ = Pow(big.NewFloat(-1), big.NewFloat(0.5))
+}
+
 // ---------- Benchmarks ----------
 
 func BenchmarkPowInt(b *testing.B) {
