@@ -1,4 +1,4 @@
-package bigfloat_test
+package bigfloat
 
 import (
 	"fmt"
@@ -6,11 +6,9 @@ import (
 	"math/big"
 	"math/rand"
 	"testing"
-
-	"github.com/ALTree/bigfloat"
 )
 
-const maxPrec uint = 1100
+// const maxPrec uint = 1100   // Already declared in misc_test.go
 
 // We can't guarantee that the result will have *prec* precision
 // if we call Sqrt with an argument with *prec* precision, because
@@ -61,7 +59,7 @@ func TestSqrt(t *testing.T) {
 			z := new(big.Float).SetPrec(prec)
 			z.Parse(test.z, 10)
 
-			x := bigfloat.Sqrt(z)
+			x := Sqrt(z)
 
 			if x.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Sqrt(%v) =\ngot  %g;\nwant %g", prec, test.z, x, want)
@@ -75,7 +73,7 @@ func testSqrtFloat64(scale float64, nTests int, t *testing.T) {
 		r := rand.Float64() * scale
 
 		z := big.NewFloat(r)
-		x64, acc := bigfloat.Sqrt(z).Float64()
+		x64, acc := Sqrt(z).Float64()
 
 		want := math.Sqrt(r)
 
@@ -107,7 +105,7 @@ func TestSqrtSpecialValues(t *testing.T) {
 		math.Inf(+1),
 	} {
 		z := big.NewFloat(f)
-		x64, acc := bigfloat.Sqrt(z).Float64()
+		x64, acc := Sqrt(z).Float64()
 		want := math.Sqrt(f)
 		if x64 != want || acc != big.Exact {
 			t.Errorf("Sqrt(%g) =\n got %g (%s);\nwant %g (Exact)", z, x64, acc, want)
@@ -123,7 +121,7 @@ func BenchmarkSqrt(b *testing.B) {
 		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
 			b.ReportAllocs()
 			for n := 0; n < b.N; n++ {
-				bigfloat.Sqrt(z)
+				Sqrt(z)
 			}
 		})
 	}

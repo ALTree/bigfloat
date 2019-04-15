@@ -15,7 +15,7 @@ func Sqrt(z *big.Float) *big.Float {
 
 	// panic on negative z
 	if z.Sign() == -1 {
-		panic("Sqrt: argument is negative")
+		panic(ErrNaN{"Sqrt: argument is negative"})
 	}
 
 	// √±0 = ±0

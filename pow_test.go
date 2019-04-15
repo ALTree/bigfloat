@@ -1,4 +1,4 @@
-package bigfloat_test
+package bigfloat
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"math/big"
 	"math/rand"
 	"testing"
-
-	"github.com/ALTree/bigfloat"
 )
 
 func TestPow(t *testing.T) {
@@ -30,7 +28,7 @@ func TestPow(t *testing.T) {
 			w := new(big.Float).SetPrec(prec)
 			w.Parse(test.w, 10)
 
-			x := bigfloat.Pow(z, w)
+			x := Pow(z, w)
 
 			if x.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Pow(%v, %v) =\ngot  %g;\nwant %g", prec, test.z, test.w, x, want)
@@ -53,6 +51,14 @@ func TestPowIntegers(t *testing.T) {
 		{"2", "-64", "5.42101086242752217003726400434970855712890625e-20"},
 
 		{"1.5", "8", "25.62890625"},
+
+		{"-2", "5", "-32"},
+		{"-2", "10", "1024"},
+		{"-2", "64", "18446744073709551616"},
+
+		{"-2", "-5", "-0.03125"},
+		{"-2", "-10", "0.0009765625"},
+		{"-2", "-64", "5.42101086242752217003726400434970855712890625e-20"},
 	} {
 		for _, prec := range []uint{24, 53, 64, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000} {
 			want := new(big.Float).SetPrec(prec)
@@ -63,7 +69,7 @@ func TestPowIntegers(t *testing.T) {
 			w := new(big.Float).SetPrec(prec)
 			w.Parse(test.w, 10)
 
-			x := bigfloat.Pow(z, w)
+			x := Pow(z, w)
 
 			if x.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Pow(%v, %v) =\ngot  %g;\nwant %g", prec, test.z, test.w, x, want)
@@ -80,7 +86,7 @@ func testPowFloat64(scale float64, nTests int, t *testing.T) {
 		z := big.NewFloat(r1).SetPrec(53)
 		w := big.NewFloat(r2).SetPrec(53)
 
-		x64, acc := bigfloat.Pow(z, w).Float64()
+		x64, acc := Pow(z, w).Float64()
 
 		want := math.Pow(r1, r2)
 
@@ -120,12 +126,17 @@ func TestPowSpecialValues(t *testing.T) {
 		{2, -0.0},
 		{4.2, 1.0},
 		{math.Inf(+1), 2.0},
+		{math.Inf(+1), -2.0},
+		{math.Inf(-1), 2.0},
+		{math.Inf(-1), -2.0},
+		{math.Inf(-1), 3.0},
+		{math.Inf(-1), -3.0},
 	} {
 		z := big.NewFloat(f.z).SetPrec(53)
 		w := big.NewFloat(f.w).SetPrec(53)
-		x64, acc := bigfloat.Pow(z, w).Float64()
+		x64, acc := Pow(z, w).Float64()
 		want := math.Pow(f.z, f.w)
-		if x64 != want || acc != big.Exact {
+		if x64 != want || acc != big.Exact || math.Signbit(x64) != math.Signbit(want) {
 			t.Errorf("Pow(%g, %g) =\n got %g (%s);\nwant %g (Exact)", f.z, f.w, x64, acc, want)
 		}
 	}
@@ -136,7 +147,7 @@ func TestPowSpecialValues(t *testing.T) {
 func BenchmarkPowInt(b *testing.B) {
 	z := big.NewFloat(2).SetPrec(1e5)
 	w := big.NewFloat(50).SetPrec(1e5)
-	_ = bigfloat.Pow(z, w) // fill pi cache before benchmarking
+	_ = Pow(z, w) // fill pi cache before benchmarking
 
 	for _, prec := range []uint{1e2, 1e3, 1e4, 1e5} {
 		z = big.NewFloat(2).SetPrec(prec)
@@ -144,7 +155,7 @@ func BenchmarkPowInt(b *testing.B) {
 		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
 			b.ReportAllocs()
 			for n := 0; n < b.N; n++ {
-				bigfloat.Pow(z, w)
+				Pow(z, w)
 			}
 		})
 	}
@@ -153,7 +164,7 @@ func BenchmarkPowInt(b *testing.B) {
 func BenchmarkPow(b *testing.B) {
 	z := big.NewFloat(2).SetPrec(1e5)
 	w := big.NewFloat(1.5).SetPrec(1e5)
-	_ = bigfloat.Pow(z, w) // fill pi cache before benchmarking
+	_ = Pow(z, w) // fill pi cache before benchmarking
 
 	for _, prec := range []uint{1e2, 1e3, 1e4, 1e5} {
 		z = big.NewFloat(2).SetPrec(prec)
@@ -161,7 +172,7 @@ func BenchmarkPow(b *testing.B) {
 		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
 			b.ReportAllocs()
 			for n := 0; n < b.N; n++ {
-				bigfloat.Pow(z, w)
+				Pow(z, w)
 			}
 		})
 	}

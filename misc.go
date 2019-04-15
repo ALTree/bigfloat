@@ -7,7 +7,7 @@ import "math/big"
 func agm(a, b *big.Float) *big.Float {
 
 	if a.Prec() != b.Prec() {
-		panic("agm: different precisions")
+		panic(ErrNaN{"agm: different precisions"})
 	}
 
 	prec := a.Prec()
@@ -39,7 +39,7 @@ func agm(a, b *big.Float) *big.Float {
 
 var piCache *big.Float
 var piCachePrec uint
-var enablePiCache bool = true
+var enablePiCache = true
 
 func init() {
 	if !enablePiCache {
@@ -125,4 +125,14 @@ func newton(fOverDf func(z *big.Float) *big.Float, guess *big.Float, dPrec uint)
 	}
 
 	return guess.SetPrec(dPrec)
+}
+
+// An ErrNaN panic is raised by a Float operation that would lead to
+// a NaN under IEEE-754 rules. An ErrNaN implements the error interface.
+type ErrNaN struct {
+	msg string
+}
+
+func (err ErrNaN) Error() string {
+	return err.msg
 }

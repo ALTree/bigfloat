@@ -1,4 +1,4 @@
-package bigfloat_test
+package bigfloat
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"math/big"
 	"math/rand"
 	"testing"
-
-	"github.com/ALTree/bigfloat"
 )
 
 // See note in sqrt_test.go about which numbers
@@ -36,7 +34,7 @@ func TestLog(t *testing.T) {
 			z := new(big.Float).SetPrec(prec)
 			z.Parse(test.z, 10)
 
-			x := bigfloat.Log(z)
+			x := Log(z)
 
 			if x.Cmp(want) != 0 {
 				t.Errorf("prec = %d, Log(%v) =\ngot %g;\n want %g", prec, test.z, x, want)
@@ -50,7 +48,7 @@ func testLogFloat64(scale float64, nTests int, t *testing.T) {
 		r := rand.Float64() * scale
 
 		z := big.NewFloat(r)
-		x64, acc := bigfloat.Log(z).Float64()
+		x64, acc := Log(z).Float64()
 
 		want := math.Log(r)
 
@@ -88,7 +86,7 @@ func TestLogSpecialValues(t *testing.T) {
 		math.Inf(+1),
 	} {
 		z := big.NewFloat(f)
-		x64, acc := bigfloat.Log(z).Float64()
+		x64, acc := Log(z).Float64()
 		want := math.Log(f)
 		if x64 != want || acc != big.Exact {
 			t.Errorf("Log(%f) =\n got %g (%s);\nwant %g (Exact)", f, x64, acc, want)
@@ -100,14 +98,14 @@ func TestLogSpecialValues(t *testing.T) {
 
 func BenchmarkLog(b *testing.B) {
 	z := big.NewFloat(2).SetPrec(1e5)
-	_ = bigfloat.Log(z) // fill pi cache before benchmarking
+	_ = Log(z) // fill pi cache before benchmarking
 
 	for _, prec := range []uint{1e2, 1e3, 1e4, 1e5} {
 		z = big.NewFloat(2).SetPrec(prec)
 		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
 			b.ReportAllocs()
 			for n := 0; n < b.N; n++ {
-				bigfloat.Log(z)
+				Log(z)
 			}
 		})
 	}

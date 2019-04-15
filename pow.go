@@ -6,8 +6,18 @@ import "math/big"
 // of the first argument. The function panics when z is negative.
 func Pow(z *big.Float, w *big.Float) *big.Float {
 
+	// Negative bases with non-integer exponents are undefined
 	if z.Sign() < 0 {
-		panic("Pow: negative base")
+		if w.IsInt() {
+			// Flip sign of base and proceed
+			z.Neg(z)
+			// If exponent is odd, then return Neg of Pow
+			if !new(big.Float).Quo(w, big.NewFloat(2)).IsInt() {
+				return new(big.Float).SetPrec(z.Prec()).Neg(Pow(z, w))
+			}
+		} else {
+			panic(ErrNaN{"Pow: negative base with non-integer exponent"})
+		}
 	}
 
 	// Pow(z, 0) = 1.0
@@ -16,9 +26,17 @@ func Pow(z *big.Float, w *big.Float) *big.Float {
 	}
 
 	// Pow(z, 1) = z
-	// Pow(+Inf, n) = +Inf
-	if w.Cmp(big.NewFloat(1)) == 0 || z.IsInf() {
+	if w.Cmp(big.NewFloat(1)) == 0 {
 		return new(big.Float).Copy(z)
+	}
+
+	// Pow(+Inf, n) = +Inf for n > 0
+	// Pow(+Inf, n) = +0 for n < 0
+	if z.IsInf() {
+		if w.Sign() > 0 {
+			return new(big.Float).Copy(z)
+		}
+		return big.NewFloat(0).SetPrec(z.Prec())
 	}
 
 	// Pow(z, -w) = 1 / Pow(z, w)
