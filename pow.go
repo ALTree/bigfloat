@@ -10,7 +10,7 @@ func Pow(z *big.Float, w *big.Float) *big.Float {
 	if z.Sign() < 0 {
 		if w.IsInt() {
 			// Flip sign of base and proceed
-			z.Neg(z)
+			z = new(big.Float).Copy(z).Neg(z)
 			// If exponent is odd, then return Neg of Pow
 			if !new(big.Float).Quo(w, big.NewFloat(2)).IsInt() {
 				return new(big.Float).SetPrec(z.Prec()).Neg(Pow(z, w))

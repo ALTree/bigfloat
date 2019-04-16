@@ -127,10 +127,10 @@ func TestPowSpecialValues(t *testing.T) {
 		{4.2, 1.0},
 		{math.Inf(+1), 2.0},
 		{math.Inf(+1), -2.0},
+		{math.Inf(-1), 1.0},
+		{math.Inf(-1), -1.0},
 		{math.Inf(-1), 2.0},
 		{math.Inf(-1), -2.0},
-		{math.Inf(-1), 3.0},
-		{math.Inf(-1), -3.0},
 	} {
 		z := big.NewFloat(f.z).SetPrec(53)
 		w := big.NewFloat(f.w).SetPrec(53)
