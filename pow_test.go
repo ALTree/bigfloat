@@ -119,18 +119,55 @@ func TestPowFloat64Big(t *testing.T) {
 }
 
 func TestPowSpecialValues(t *testing.T) {
+	negZero := math.Pow(math.Inf(-1), -1)
 	for _, f := range []struct {
 		z, w float64
 	}{
-		{2, +0.0},
-		{2, -0.0},
+		{0.0, +0.0},
+		{0.0, negZero},
+		{2.0, +0.0},
+		{2.0, negZero},
 		{4.2, 1.0},
+		{0.0, 1.0},
+		{0.0, 2.0},
+		{0.0, -1.0},
+		{0.0, -2.0},
+		{0.0, math.Inf(-1)},
+		{0.0, math.Inf(1)},
+		{negZero, 1.0},
+		{negZero, 2.0},
+		{negZero, -1.0},
+		{negZero, -2.0},
+		{negZero, math.Inf(-1)},
+		{negZero, math.Inf(1)},
+		{1.0, math.Inf(+1)},
+		{1.0, math.Inf(-1)},
+		{-1.0, math.Inf(+1)},
+		{-1.0, math.Inf(-1)},
+		{2.0, math.Inf(+1)},
+		{2.0, math.Inf(-1)},
+		{-2.0, math.Inf(+1)},
+		{-2.0, math.Inf(-1)},
+		{0.5, math.Inf(+1)},
+		{0.5, math.Inf(-1)},
+		{-0.5, math.Inf(+1)},
+		{-0.5, math.Inf(-1)},
+		{math.Inf(+1), 0.0},
+		{math.Inf(+1), negZero},
+		{math.Inf(+1), 1.0},
+		{math.Inf(+1), -1.0},
 		{math.Inf(+1), 2.0},
 		{math.Inf(+1), -2.0},
+		{math.Inf(+1), 0.5},
+		{math.Inf(+1), -0.5},
+		{math.Inf(-1), 0.0},
+		{math.Inf(-1), negZero},
 		{math.Inf(-1), 1.0},
 		{math.Inf(-1), -1.0},
 		{math.Inf(-1), 2.0},
 		{math.Inf(-1), -2.0},
+		{math.Inf(-1), 0.5},
+		{math.Inf(-1), -0.5},
 	} {
 		z := big.NewFloat(f.z).SetPrec(53)
 		w := big.NewFloat(f.w).SetPrec(53)

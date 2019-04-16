@@ -6,22 +6,13 @@ import "math/big"
 // of the first argument. The function panics when z is negative.
 func Pow(z *big.Float, w *big.Float) *big.Float {
 
-	// Negative bases with non-integer exponents are undefined
-	if z.Sign() < 0 {
-		if w.IsInt() {
-			// Flip sign of base and proceed
-			z = new(big.Float).Copy(z).Neg(z)
-			// If exponent is odd, then return Neg of Pow
-			if !new(big.Float).Quo(w, big.NewFloat(2)).IsInt() {
-				return new(big.Float).SetPrec(z.Prec()).Neg(Pow(z, w))
-			}
-		} else {
-			panic(ErrNaN{"Pow: negative base with non-integer exponent"})
-		}
-	}
-
 	// Pow(z, 0) = 1.0
 	if w.Sign() == 0 {
+		return big.NewFloat(1).SetPrec(z.Prec())
+	}
+
+	// Pow(1, w) = 1.0
+	if z.Cmp(big.NewFloat(1)) == 0 {
 		return big.NewFloat(1).SetPrec(z.Prec())
 	}
 
@@ -30,13 +21,37 @@ func Pow(z *big.Float, w *big.Float) *big.Float {
 		return new(big.Float).Copy(z)
 	}
 
+	// Pow(-1, ±Inf) = 1
+	if w.IsInf() && z.Cmp(big.NewFloat(-1)) == 0 {
+		return big.NewFloat(1).SetPrec(z.Prec())
+	}
+
 	// Pow(+Inf, n) = +Inf for n > 0
 	// Pow(+Inf, n) = +0 for n < 0
+	// Pow(-Inf, n) = Pow(-0, -y)
 	if z.IsInf() {
-		if w.Sign() > 0 {
-			return new(big.Float).Copy(z)
+		if z.Sign() > 0 {
+			if w.Sign() > 0 {
+				return new(big.Float).Copy(z)
+			}
+			return big.NewFloat(0).SetPrec(z.Prec())
 		}
-		return big.NewFloat(0).SetPrec(z.Prec())
+		// z.Sign() < 0
+		return Pow(new(big.Float).SetPrec(z.Prec()).Neg(big.NewFloat(0)), new(big.Float).Neg(w))
+	}
+
+	// Negative bases with non-integer exponents are undefined
+	if z.Sign() < 0 {
+		// Flip sign of base and proceed
+		z = new(big.Float).Copy(z).Neg(z)
+		if w.IsInt() {
+			// If exponent is odd, then return Neg of Pow
+			if !new(big.Float).Quo(w, big.NewFloat(2)).IsInt() {
+				return new(big.Float).SetPrec(z.Prec()).Neg(Pow(z, w))
+			}
+		} else if !w.IsInf() {
+			panic(ErrNaN{"Pow: negative base with non-integer exponent"})
+		}
 	}
 
 	// Pow(z, -w) = 1 / Pow(z, w)
@@ -54,7 +69,7 @@ func Pow(z *big.Float, w *big.Float) *big.Float {
 	// 	return powInt(z, int(wi))
 	// }
 
-	// compute w**z as exp(z log(w))
+	// compute z**w as exp(w log(z))
 	x := new(big.Float).SetPrec(z.Prec() + 64)
 	logZ := Log(new(big.Float).Copy(z).SetPrec(z.Prec() + 64))
 	x.Mul(w, logZ)
