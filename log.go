@@ -68,7 +68,7 @@ func Log(z *big.Float) *big.Float {
 	// if
 	//     x >= 2**(prec/2),
 	// where prec is the desired precision (in bits)
-	pi := pi(prec)
+	pi := PI(prec)
 	agm := agm(one, x.Quo(four, x)) // agm = AGM(1, 4/x)
 
 	x.Quo(pi, x.Mul(two, agm)) // reuse x, we don't need it

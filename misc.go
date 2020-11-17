@@ -59,7 +59,7 @@ func init() {
 }
 
 // pi returns pi to prec bits of precision
-func pi(prec uint) *big.Float {
+func PI(prec uint) *big.Float {
 
 	if prec <= piCachePrec && enablePiCache {
 		return new(big.Float).Copy(piCache).SetPrec(prec)
