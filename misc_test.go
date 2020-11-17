@@ -47,7 +47,7 @@ func TestPi(t *testing.T) {
 		want := new(big.Float).SetPrec(prec)
 		want.Parse(piStr, 10)
 
-		z := pi(prec)
+		z := PI(prec)
 
 		if z.Cmp(want) != 0 {
 			t.Errorf("Pi(%d) =\ngot  %g;\nwant %g", prec, z, want)
@@ -77,7 +77,7 @@ func BenchmarkPi(b *testing.B) {
 		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
 			b.ReportAllocs()
 			for n := 0; n < b.N; n++ {
-				pi(prec)
+				PI(prec)
 			}
 		})
 	}
