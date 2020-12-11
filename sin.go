@@ -8,11 +8,17 @@ import (
 func Sin(z *big.Float) *big.Float {
 	prec := z.Prec()
 	one := big.NewFloat(1).SetPrec(prec)
+	zz := big.NewFloat(0).SetPrec(prec)
+	zz.Set(z)
 	sign := true
+	if zz.Cmp(big.NewFloat(0).SetPrec(0)) < 0 {
+		zz.Neg(zz)
+		sign = false
+	}
 	a, d, i := big.NewFloat(0).SetPrec(prec), big.NewFloat(6).SetPrec(prec),
 		big.NewFloat(3).SetPrec(prec)
 	for {
-		b := Pow(z, i)
+		b := Pow(zz, i)
 		b = b.Quo(b, d)
 		cp := big.NewFloat(0).SetPrec(prec).Set(a)
 		if sign {
