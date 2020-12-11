@@ -5,6 +5,7 @@ import (
 )
 
 // Sin compute the sin of the value
+// https://people.math.sc.edu/girardi/m142/handouts/10sTaylorPolySeries.pdf
 func Sin(z *big.Float) *big.Float {
 	prec := z.Prec()
 	one := big.NewFloat(1).SetPrec(prec)
