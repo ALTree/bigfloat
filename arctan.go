@@ -5,6 +5,7 @@ import (
 )
 
 // Arctan is the inverse tan
+// https://proofwiki.org/wiki/Power_Series_Expansion_for_Real_Arctangent_Function
 func Arctan(z *big.Float) *big.Float {
 	prec := z.Prec()
 	one := big.NewFloat(1).SetPrec(prec)
