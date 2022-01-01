@@ -25,7 +25,7 @@ import (
 )
 
 // In this example, we'll compute the value of the
-// trascendental number 2 ** √2, also known as
+// transcendental number 2 ** √2, also known as
 // the Gelfond–Schneider constant, to 1000 bits.
 func main() {
 	// Work with 1000 binary digits of precision.
