@@ -31,7 +31,7 @@ func agm(a, b *big.Float) *big.Float {
 	for t.Sub(a2, b2).Cmp(lim) != -1 {
 		t.Copy(a2)
 		a2.Add(a2, b2).Mul(a2, half)
-		b2 = Sqrt(b2.Mul(b2, t))
+		b2.Sqrt(b2.Mul(b2, t))
 	}
 
 	return a2.SetPrec(prec)
@@ -72,12 +72,12 @@ func pi(prec uint) *big.Float {
 
 	half := big.NewFloat(0.5)
 	two := big.NewFloat(2).SetPrec(prec + 64)
+	sqrt2 := new(big.Float).SetPrec(prec + 64).Sqrt(two)
 
-	// initialization
-	a := big.NewFloat(1).SetPrec(prec + 64)    // a = 1
-	b := new(big.Float).Mul(Sqrt(two), half)   // b = 1/√2
-	t := big.NewFloat(0.25).SetPrec(prec + 64) // t = 1/4
-	x := big.NewFloat(1).SetPrec(prec + 64)    // x = 1
+	a := big.NewFloat(1).SetPrec(prec + 64)               // a = 1
+	b := new(big.Float).SetPrec(prec+64).Mul(sqrt2, half) // b = 1/√2
+	t := big.NewFloat(0.25).SetPrec(prec + 64)            // t = 1/4
+	x := big.NewFloat(1).SetPrec(prec + 64)               // x = 1
 
 	// limit is 2**(-prec)
 	lim := new(big.Float)
@@ -88,7 +88,7 @@ func pi(prec uint) *big.Float {
 	for y.Sub(a, b).Cmp(lim) != -1 { // assume a > b
 		y.Copy(a)
 		a.Add(a, b).Mul(a, half) // a = (a+b)/2
-		b = Sqrt(b.Mul(b, y))    // b = √(ab)
+		b.Sqrt(b.Mul(b, y))      // b = √(ab)
 
 		y.Sub(a, y)           // y = a - y
 		y.Mul(y, y).Mul(y, x) // y = x(a-y)²
