@@ -3,11 +3,24 @@ package bigfloat
 import "math/big"
 
 // Pow returns a big.Float representation of z**w. Precision is the same as the one
-// of the first argument. The function panics when z is negative.
+// of the first argument. The function panics when z is negative and w is
+// not an integer.
 func Pow(z *big.Float, w *big.Float) *big.Float {
 
 	if z.Sign() < 0 {
-		panic("Pow: negative base")
+		// For negative base, handle integer exponents: (-z)^n = (-1)^n * z^n
+		if w.IsInt() {
+			// Compute |z|^w
+			abs := new(big.Float).Abs(z)
+			result := Pow(abs, w)
+			// If exponent is odd, negate the result
+			wInt, _ := w.Int(nil)
+			if wInt.Bit(0) == 1 { // odd
+				result.Neg(result)
+			}
+			return result
+		}
+		panic("Pow: negative base with non-integer exponent")
 	}
 
 	// Pow(z, 0) = 1.0
